@@ -1,0 +1,12 @@
+{
+  "name": "crowd-test",
+  "version": "0.5.0",
+  "author": "local",
+  "description": "Spawns a repeatable crowd of player-bodied characters to measure client FPS.",
+  "mafiahub": {
+    "clientScripts": ["client/main.js"],
+    "serverScripts": ["server/main.js"],
+    "files": [],
+    "errorBehavior": "continue"
+  }
+}
