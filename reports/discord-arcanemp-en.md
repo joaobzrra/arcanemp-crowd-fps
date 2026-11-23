@@ -26,5 +26,5 @@ No effect on remote characters: `a.URO.*`, `a.ForceParallelAnimUpdate`, `p.Cloth
 5. Spread proxy spawns over several frames.
 6. Server option: per-player stream range or visible-player cap.
 
-Data, test scripts, installer: <GITHUB_LINK>
+Data, test scripts, installer: https://github.com/joaobzrra/arcanemp-crowd-fps
 — João Bezerra

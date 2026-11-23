@@ -23,5 +23,5 @@ Engine.ini.before-crowdfix.
 Side effect: character models are slightly simpler up close.
 
 What it sets: [SystemSettings] r.SkeletalMeshLODBias=2 (or 1).
-Source and test data: <GITHUB_LINK>
+Source and test data: https://github.com/joaobzrra/arcanemp-crowd-fps
 Author: Joao Bezerra. MIT licence. Not affiliated with ArcaneMP, MafiaHub or WB Games.

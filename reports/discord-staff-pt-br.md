@@ -15,7 +15,7 @@ Uso da GPU          90%  ->  28%   (gargalo é o processador)
 **Correção que já funciona (lado do jogador)**
 `r.SkeletalMeshLODBias=2` em `[SystemSettings]` no arquivo `%LOCALAPPDATA%\Hogwarts Legacy\ArcaneMP\Saved\Config\WindowsNoEditor\Engine.ini`
 Com 100 personagens: **39,3 → 57,3 FPS (+46%)**. Vale para o launcher Forge também (mesma pasta).
-Instalador de 1 clique (instalar/desinstalar): <GITHUB_LINK>
+Instalador de 1 clique (instalar/desinstalar): https://github.com/joaobzrra/arcanemp-crowd-fps/releases/latest
 Custo: modelos de personagem um pouco mais simples de perto.
 
 **Não usar**: `p.ClothPhysics=0` trava o jogo ao teleportar (testado 2 vezes).
