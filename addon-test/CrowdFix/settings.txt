@@ -1,0 +1,4 @@
+enabled=1
+distance=2500
+interpolate=1
+animrate=2

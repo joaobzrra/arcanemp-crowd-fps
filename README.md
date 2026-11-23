@@ -27,6 +27,14 @@ under `[SystemSettings]` and keeps a copy as `Engine.ini.before-crowdfix`. It re
 
 Do **not** add `p.ClothPhysics=0`: it crashes the client on teleport.
 
+## Add-on test (CrowdFix, UE4SS)
+
+The config fix above only helps the render thread. A separate test add-on lowers the game-thread cost of
+distant remote players (URO on their body mesh beyond 25 m): with the LOD fix, 100 characters spread
+over 15-50 m went from 56.8 to a stable 61 FPS with no visible stutter.
+Test build, not approved by ArcaneMP yet. All tests, numbers and visual verdicts:
+[addon-test/RESULTS-ADDON.md](addon-test/RESULTS-ADDON.md).
+
 ## For modders
 
 Full data: [results/RESULTS.md](results/RESULTS.md). Posts sent to the mod team and a server staff:

@@ -18,6 +18,7 @@ const RING0_CM = 300;      // first ring radius
 const RING_STEP_CM = 170;  // distance between rings
 const SLOT_CM = 160;       // spacing along a ring
 const WALK_CM = 400;       // length of each back-and-forth walk
+let SPREAD = 1;            // console: crowdspread <x>  (ring radius multiplier for the next spawn)
 const MAX_CROWD = 250;
 
 const SETTLE_S = 60;
@@ -100,8 +101,9 @@ function ringPositions(origin, count) {
   const out = [];
   let ring = 0;
   while (out.length < count) {
-    const r = RING0_CM + ring * RING_STEP_CM;
-    const slots = Math.max(6, Math.floor((2 * Math.PI * r) / SLOT_CM));
+    const r0 = RING0_CM + ring * RING_STEP_CM;
+    const r = r0 * SPREAD;   // SPREAD > 1 keeps the same rings but spaces them out (wider, like an outdoor server)
+    const slots = Math.max(6, Math.floor((2 * Math.PI * r0) / SLOT_CM));
     for (let s = 0; s < slots && out.length < count; s++) {
       const a = (2 * Math.PI * s) / slots + ring * 0.37;
       out.push({ x: origin.x + Math.cos(a) * r, y: origin.y + Math.sin(a) * r, z: origin.z, a, r });
@@ -384,9 +386,39 @@ Events.on("loadingFinished", (player) => {
   log(`loadingFinished for ${player.nickname} (id ${player.id}) at ${JSON.stringify(player.position)}`);
 });
 
-Events.on("consoleCommand", (command, args) => {
+// Command file: each line of <server>/crowd-cmd.txt ("crowdrun walk 100,100") runs like a console command,
+// then the file is deleted. Lets a test driver send commands without typing into the console window.
+let fsMod = null;
+try { fsMod = require("fs"); } catch (e) { log("command file disabled: " + e); }
+const CMD_FILE = "crowd-cmd.txt";
+if (fsMod) {
+  setInterval(() => {
+    try {
+      if (!fsMod.existsSync(CMD_FILE)) return;
+      const text = fsMod.readFileSync(CMD_FILE, "utf8");
+      fsMod.unlinkSync(CMD_FILE);
+      for (const line of text.split(/\r?\n/)) {
+        const parts = line.trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 0) continue;
+        log("command file: " + parts.join(" "));
+        handleCommand(parts[0], parts.slice(1));
+      }
+    } catch (e) { log("command file error: " + e); }
+  }, 1000);
+  log("command file enabled: " + CMD_FILE + " (cwd " + process.cwd() + ")");
+}
+
+Events.on("consoleCommand", (command, args) => handleCommand(command, args));
+
+function handleCommand(command, args) {
   const cmd = String(command).toLowerCase();
   if (cmd === "crowdstop") { stopRun(); return; }
+  if (cmd === "crowdspread") {
+    const v = Number(args && args[0]);
+    if (v > 0 && v <= 10) SPREAD = v;
+    log("spread now " + SPREAD);
+    return;
+  }
   if (cmd !== "crowdrun") return;
   const requested = String((args && args[0]) || "walk").toLowerCase();
   const mode = ["walk", "walknamed", "stand", "heavy", ...PLAYERLIKE].includes(requested) ? requested : "walk";
@@ -394,7 +426,7 @@ Events.on("consoleCommand", (command, args) => {
   const online = PlayerManager.getAll();
   if (online.length === 0) { log("crowdrun: nobody online"); return; }
   startRun(online[0], mode, schedule);
-});
+}
 
 Events.onClient("crowdtest:frame", (player, payload) => {
   if (!payload || typeof payload.ticksPerSec !== "number") return;
