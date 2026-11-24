@@ -1,0 +1,148 @@
+[export] ArcaneMP client log, boot started 2026-11-24 14:02:13 (local time). Personal data replaced by placeholders.
+[export] 1116 '[AOB] [trace]' pattern-resolution lines removed.
+[2026-11-24 14:02:11.496] [Launcher] [info] Loading launcher settings from JSON config file...
+[2026-11-24 14:02:11.583] [Launcher] [info] Steam game: version 2153883, timestamp 0x6ADBD77D, 383492096 bytes: supported (this release supports 2153883)
+[2026-11-24 14:02:11.611] [Launcher] [info] Loading game D:/SteamLibrary/steamapps/common/Hogwarts Legacy\Phoenix/Binaries/Win64/HogwartsLegacy.exe
+[2026-11-24 14:02:11.611] [Launcher] [info] Loaded game (365.73 MB or 383492096)
+[2026-11-24 14:02:12.923] [Launcher] [info] Suppressing duplicate mapped-EXE TLS atexit registration
+[2026-11-24 14:02:13.095] [Launcher] [info] Process identity now reports the game executable to every loaded module
+[2026-11-24 14:02:13.095] [Launcher] [info] Mapped game command line: "D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Phoenix\Binaries\Win64\HogwartsLegacy.exe" -dx12 -SaveToUserDir -UserDir="Hogwarts Legacy\ArcaneMP" -SkipEpilepsy
+[2026-11-24 14:02:13.310] [Launcher] [info] Game TLS forwarding: 7 of the game's 9 callbacks get thread attach/detach (protector); 12 threads already running
+[2026-11-24 14:02:13.313] [Launcher] [error] Could not replace C:\Users\USER\AppData\Local\Hogwarts Legacy\ArcaneMP\Saved\Config\WindowsNoEditor\GameUserSettings.ini (error 5); frame generation stays on and the game will likely crash at boot
+[2026-11-24 14:02:13.106] [Client] [info] ArcaneMP 1.15.1 (b8ce055)
+[2026-11-24 14:02:13.170] [Client] [info] Crash reporting installed at entry point
+[2026-11-24 14:02:13.170] [Hooks] [info] reserved 4 trampoline blocks below the image at 0x140000000
+[2026-11-24 14:02:13.227] [Client] [info] Armed post-unpack ArcaneMP client initialization
+[2026-11-24 14:02:13.607] [Client] [info] Reached post-unpack CRT boundary; starting ArcaneMP client
+[2026-11-24 14:02:13.609] [Hooking] [info] Pattern table seeded 2242 addresses
+[2026-11-24 14:02:13.611] [AOB] [info] resolved 1114/1114 patterns, 0 stale, 0 optional-missing, 0 not on this build (Steam buildid 20773316 (2025-12-21))
+[2026-11-24 14:02:13.612] [Client] [debug] Running module: StoryScenes
+[2026-11-24 14:02:13.614] [Client] [debug] Running module: World
+[2026-11-24 14:02:13.614] [Client] [debug] Running module: FreerideLoader
+[2026-11-24 14:02:13.614] [Client] [debug] Running module: WorldLifecycle
+[2026-11-24 14:02:13.615] [Client] [debug] Running module: UiNativeSignals
+[2026-11-24 14:02:13.616] [Client] [debug] Running module: UiNativePauseMenu
+[2026-11-24 14:02:13.616] [Client] [debug] Running module: Train
+[2026-11-24 14:02:13.616] [Client] [debug] Running module: FastTravelGate
+[2026-11-24 14:02:13.616] [Client] [debug] Running module: WandGlow
+[2026-11-24 14:02:13.617] [Client] [debug] Running module: StateEffects
+[2026-11-24 14:02:13.619] [Client] [debug] Running module: SpellLearning
+[2026-11-24 14:02:13.619] [Client] [debug] Running module: ProtegoLockGate
+[2026-11-24 14:02:13.619] [Client] [debug] Running module: SpellDefinitions
+[2026-11-24 14:02:13.620] [Client] [debug] Running module: SpellCast
+[2026-11-24 14:02:13.620] [Client] [debug] Running module: SpellAssignment
+[2026-11-24 14:02:13.620] [Client] [debug] Running module: SuspendEnemiesGuard
+[2026-11-24 14:02:13.620] [SuspendEnemiesGuard] [info] Suspend-enemies guard installed
+[2026-11-24 14:02:13.620] [Client] [debug] Running module: PlayerSpeaker
+[2026-11-24 14:02:13.621] [Speaker] [info] dialogue hooks: caption=true voice=true
+[2026-11-24 14:02:13.621] [Client] [debug] Running module: PlayerController
+[2026-11-24 14:02:13.622] [Client] [debug] Running module: PlayerMoveStick
+[2026-11-24 14:02:13.622] [Client] [debug] Running module: DownedProbe
+[2026-11-24 14:02:13.622] [Client] [debug] Running module: CapsuleGuard
+[2026-11-24 14:02:13.625] [CapsuleGuard] [info] Capsule guard installed
+[2026-11-24 14:02:13.625] [Client] [debug] Running module: CamShakeGuard
+[2026-11-24 14:02:13.626] [CamShakeGuard] [info] Cam-shake guard installed
+[2026-11-24 14:02:13.626] [Client] [debug] Running module: BodyLeanGuard
+[2026-11-24 14:02:13.627] [Client] [debug] Running module: BipedPlayerGuard
+[2026-11-24 14:02:13.628] [Client] [debug] Running module: NpcWeaponFire
+[2026-11-24 14:02:13.628] [Client] [debug] Running module: SpawnerRegistration
+[2026-11-24 14:02:13.629] [Client] [debug] Running module: NpcPriorityTarget
+[2026-11-24 14:02:13.629] [Client] [debug] Running module: AmbientPopulation
+[2026-11-24 14:02:13.630] [Client] [debug] Running module: NpcMoveEnterTree
+[2026-11-24 14:02:13.630] [Client] [debug] Running module: NpcKillReward
+[2026-11-24 14:02:13.631] [Client] [debug] Running module: NpcBusEvents
+[2026-11-24 14:02:13.631] [Client] [debug] Running module: NpcAbilityEvent
+[2026-11-24 14:02:13.631] [Client] [debug] Running module: PakMount
+[2026-11-24 14:02:13.632] [Client] [debug] Running module: ModUnstageQueued
+[2026-11-24 14:02:13.660] [Client] [debug] Running module: ModCatalogHooks
+[2026-11-24 14:02:13.662] [Client] [debug] Running module: ModInstallSpaceCheck
+[2026-11-24 14:02:13.663] [Client] [debug] Running module: ModInstallErrors
+[2026-11-24 14:02:13.664] [ModSync] [info] CurseForge error diagnostics registered
+[2026-11-24 14:02:13.664] [Client] [debug] Running module: MapIcons
+[2026-11-24 14:02:13.665] [Client] [debug] Running module: InventoryStackLimits
+[2026-11-24 14:02:13.665] [Client] [debug] Running module: Interaction
+[2026-11-24 14:02:13.666] [Client] [debug] Running module: SpecialNotifications
+[2026-11-24 14:02:13.666] [SpecialNotifications] [info] special notifications off: 7 setting gates flipped
+[2026-11-24 14:02:13.666] [Client] [debug] Running module: HudGroups
+[2026-11-24 14:02:13.667] [Client] [debug] Running module: HousePoints
+[2026-11-24 14:02:13.667] [Client] [debug] Running module: Herbology
+[2026-11-24 14:02:13.668] [Client] [debug] Running module: FieldGuide
+[2026-11-24 14:02:13.669] [Client] [debug] Running module: Doors
+[2026-11-24 14:02:13.669] [Client] [debug] Running module: BeastMovement
+[2026-11-24 14:02:13.670] [Client] [debug] Running module: BeastCare
+[2026-11-24 14:02:13.671] [Client] [debug] Running module: BeastCapture
+[2026-11-24 14:02:13.674] [Client] [debug] Running module: Brewing
+[2026-11-24 14:02:13.674] [Client] [debug] Running module: DialoguePolicy
+[2026-11-24 14:02:13.675] [Dialogue] [info] line post hook: true
+[2026-11-24 14:02:13.675] [Client] [debug] Running module: GhostLook
+[2026-11-24 14:02:13.675] [Client] [debug] Running module: UE4_impl
+[2026-11-24 14:02:13.675] [Client] [debug] Running module: Playground
+[2026-11-24 14:02:13.675] [Client] [debug] Running module: Render_Device
+[2026-11-24 14:02:13.676] [Client] [debug] Running module: MenuTransition
+[2026-11-24 14:02:13.677] [Client] [debug] Running module: MenuPause
+[2026-11-24 14:02:13.678] [Client] [debug] Running module: MenuGatePages
+[2026-11-24 14:02:13.678] [Client] [debug] Running module: RegionEvent
+[2026-11-24 14:02:13.679] [Client] [debug] Running module: GameBus
+[2026-11-24 14:02:13.681] [Client] [debug] Running module: Engine_Crash
+[2026-11-24 14:02:13.682] [Client] [debug] Running module: Engine
+[2026-11-24 14:02:13.744] [Client] [info] Crash reporting initialized
+[2026-11-24 14:02:13.745] [CrashTrail] [info] The exception filter at HogwartsLegacy.exe+0x3A48580 had replaced crash reporting; it still runs first, and what it lets through now reaches crash reporting
+[2026-11-24 14:02:13.746] [Client] [info] Discord presence initialized
+[2026-11-24 14:02:13.772] [Client] [info] Networking engine initialized
+[2026-11-24 14:02:13.772] [Client] [debug] Voice client attached; devices open with the session
+[2026-11-24 14:02:13.773] [Client] [debug] Networking messages registered
+[2026-11-24 14:02:13.774] [Preferences] [info] Loaded 6 preference(s) from 'C:\Users\USER\AppData\Local\MafiaHub\ArcaneMP\preferences.json'
+[2026-11-24 14:02:13.774] [Preferences] [info] Voice: enabled=true mode=pushToTalk key=mouse5 volume=1.5 threshold=0.<id> release=100ms noiseSuppression=false device=''
+[2026-11-24 14:02:13.775] [Utils] [debug] [StateMachine] Requesting new state Initialize
+[2026-11-24 14:02:14.532] [Networking] [info] Networking messages registered!
+[2026-11-24 14:02:14.532] [Client] [info] Mod subsystems initialized
+[2026-11-24 14:02:14.532] [Client] [debug] Client has been initialized
+[2026-11-24 14:02:14.544] [PakMount] [info] no copies of the files\paks containers in the game pak folders: 'D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Phoenix\Content\Paks\', 'C:\Users\USER\AppData\Local\Hogwarts Legacy\ArcaneMP\Saved\Paks\', 'D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Engine\Content\Paks\'
+[2026-11-24 14:02:14.544] [PakMount] [info] appended '<private-client>\files\paks' to the engine pak scan (4 folders)
+[2026-11-24 14:02:40.478] [FreerideLoader] [info] render drain before teardown: flushed in 0 ms
+[2026-11-24 14:02:40.483] [IntroGate] [info] HasCompletedIntro exec swapped: UFunction 0x2e799950 orig 0x1438cc320
+[2026-11-24 14:02:40.483] [FreerideLoader] [trace] LoadMap teardown: blocked=false remotes=0 proxies=0 forms=0 prop=false placed=0 plots=0 map '/Game/Levels/RootLevel'
+[2026-11-24 14:02:40.496] [FreerideLoader] [info] render drain before LoadMap: flushed in 16 ms
+[2026-11-24 14:02:41.285] [IntroGate] [info] HasCompletedIntro call #1 forced true (real=true)
+[2026-11-24 14:02:41.950] [Client] [debug] DX12 hooks installed (Present 0x7ffa3d4384c0, ExecuteCommandLists 0x7ff93809c700)
+[2026-11-24 14:02:41.957] [Graphics] [info] r.SkinCache.SceneMemoryLimitInMB 128 -> 512
+[2026-11-24 14:02:41.957] [Graphics] [info] PhoenixSigMgr.LOD.TriangleBudget 2000000 -> 4000000
+[2026-11-24 14:02:41.959] [SpellCast] [info] ASpellTool::Start swapped into 45 vtables
+[2026-11-24 14:02:41.960] [RegionEvent] [trace] listening for EnteredRegion (fname 7811704)
+[2026-11-24 14:02:41.962] [GameBus] [trace] subscribed NearDeathKneelBegin (fname 7799901)
+[2026-11-24 14:02:41.962] [GameBus] [trace] subscribed PlayerDied (fname 6005589)
+[2026-11-24 14:02:41.962] [GameBus] [trace] subscribed NPCDead (fname 7876670)
+[2026-11-24 14:02:41.962] [GameBus] [trace] subscribed PlayerDied (fname 6005589, sync)
+[2026-11-24 14:02:43.169] [Integrations] [debug] [Discord] Current user updated <redacted>
+[2026-11-24 14:02:43.456] [Utils] [debug] [StateMachine] Requesting new state InMenu
+[2026-11-24 14:02:43.550] [Graphics] [info] D3D12 device 0x38635d70
+[2026-11-24 14:02:43.550] [Client] [info] Rendering systems initialized
+[2026-11-24 14:02:43.556] [Graphics] [info] ImGui DX12 pipeline format 24, back buffer format 24
+[2026-11-24 14:02:43.689] [Graphics] [debug] Overlay scaled for a 1920x1080 back buffer behind a 1920x1080 window
+[2026-11-24 14:02:43.698] [Web] [debug] Initializing CEF: module '<private-client>', cache profile '<private-client>\cache\profiles\0', log '<private-client>\logs\cef.log'
+[2026-11-24 14:02:43.707] [CrashTrail] [critical] Unhandled exception 0xC0000005 at gameoverlayrenderer64.dll+0x8192F on thread 33532 'RHIThread'
+Faulting read of 0x0
+RIP 00007FF9A6A9192F RSP 0000000165E4E810 RBP 0000000165E4E888
+RAX 000000025717AD60 RBX 0000000255D309E0 RCX 0000000000000000 RDX 0000000000000001
+RSI 0000000255D309E0 RDI 00000004F4CA2450 R8  0000000165E4E860 R9  00007FF9A6B1FC3A
+R10 00007FF9A6A10000 R11 00007FF9A6B1FE11 R12 0000000000000000 R13 0000000000000000
+R14 0000000000000000 R15 0000000000000761
+Unwound stack:
+  #00 gameoverlayrenderer64.dll+0x8192F
+  #01 gameoverlayrenderer64.dll+0xCA0CD
+  #02 gameoverlayrenderer64.dll+0xCB31F
+  #03 gameoverlayrenderer64.dll+0x9C204
+  #04 ArcaneMPClient.dll+0x2518A3
+  #05 amd_fidelityfx_dx12.dll+0x21992
+  #06 amd_fidelityfx_dx12.dll+0x1EAA7
+  #07 HogwartsLegacy.exe+0x3F9F496
+  #08 HogwartsLegacy.exe+0x3F9F2A5
+  #09 HogwartsLegacy.exe+0x3FA10E8
+  #10 HogwartsLegacy.exe+0x4F658FB
+  #11 HogwartsLegacy.exe+0x4F65EFB
+  #12 HogwartsLegacy.exe+0x390638B
+  #13 HogwartsLegacy.exe+0x4FA60CB
+  #14 HogwartsLegacy.exe+0x3A58AA7
+  #15 HogwartsLegacy.exe+0x3A52BD1
+  #16 KERNEL32.DLL+0x2DDA7
+  #17 ntdll.dll+0xC9C5C

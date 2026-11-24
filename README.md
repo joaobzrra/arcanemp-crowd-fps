@@ -37,8 +37,9 @@ Test build, not approved by ArcaneMP yet. All tests, numbers and visual verdicts
 
 ## Frame generation
 
-ArcaneMP 1.15.1 turns frame generation off at every start. Eight test runs with it kept selected (NVIDIA
-DLSS, AMD FSR 3, Intel XeSS and the driver-level NVIDIA Smooth Motion) all fail.
+ArcaneMP 1.15.1 turns frame generation off at every start. Every test run with it kept selected (NVIDIA
+DLSS, AMD FSR 3, Intel XeSS and the driver-level NVIDIA Smooth Motion) fails, and the Direct3D 12 debug
+layer names the call that removes the graphics device.
 Results, errors, logs and crash report extracts: [frame-generation/](frame-generation/).
 
 ## For modders

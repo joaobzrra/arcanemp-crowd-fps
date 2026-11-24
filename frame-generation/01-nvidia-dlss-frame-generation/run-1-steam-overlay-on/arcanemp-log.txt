@@ -105,12 +105,3 @@ ent] [debug] Running module: RegionEvent
 [2026-11-24 12:25:13.308] [FreerideLoader] [trace] LoadMap teardown: blocked=false remotes=0 proxies=0 forms=0 prop=false placed=0 plots=0 map '/Game/Levels/RootLevel'
 [2026-11-24 12:25:13.308] [FreerideLoader] [info] render drain before LoadMap: flushed in 0 ms
 [2026-11-24 12:25:13.838] [IntroGate] [info] HasCompletedIntro call #1 forced true (real=true)
-[2026-11-24 12:48:53.170] [Launcher] [info] Loading launcher settings from JSON config file...
-[2026-11-24 12:48:53.543] [Launcher] [info] Steam game: version 2153883, timestamp 0x6ADBD77D, 383492096 bytes: supported (this release supports 2153883)
-[2026-11-24 12:48:53.880] [Launcher] [info] Loading game D:/SteamLibrary/steamapps/common/Hogwarts Legacy\Phoenix/Binaries/Win64/HogwartsLegacy.exe
-[2026-11-24 12:48:53.880] [Launcher] [info] Loaded game (365.73 MB or 383492096)
-[2026-11-24 12:48:54.146] [Launcher] [info] Suppressing duplicate mapped-EXE TLS atexit registration
-[2026-11-24 12:48:54.785] [Launcher] [info] Process identity now reports the game executable to every loaded module
-[2026-11-24 12:48:54.785] [Launcher] [info] Mapped game command line: "D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Phoenix\Binaries\Win64\HogwartsLegacy.exe" -dx12 -SaveToUserDir -UserDir="Hogwarts Legacy\ArcaneMP" -SkipEpilepsy
-[2026-11-24 12:48:54.966] [Launcher] [info] Game TLS forwarding: 7 of the game's 9 callbacks get thread attach/detach (protector); 12 threads already running
-[2026-11-24 12:48:54.969] [Launcher] [error] Could not replace C:\Users\USER\AppData\Local\Hogwarts Legacy\ArcaneMP\Saved\Config\WindowsNoEditor\GameUserSettings.ini (error 5); frame generation stays on and the game will likely crash at boot
