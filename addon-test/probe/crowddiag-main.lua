@@ -13,6 +13,8 @@
 --   hidden <followers|body|all8> <on|off> SetHiddenInGame (render-side ablation: nothing of that group is drawn)
 --   comptick <ClassName> <off|on>         SetComponentTickEnabled on every component of that class owned by a remote avatar
 --   lua <file>                            run Scripts\<file> (dofile) in the game thread: new experiments without a restart
+--   tickfar <meters> <off|on>             mesh ticks of avatars farther than <meters> from the local character
+--   attachtick <off|on>                   mesh ticks of wands held by avatars and of mounts carrying avatars
 -- "followers" = the avatar's skeletal meshes other than avatar.Mesh (the body, CharacterMesh0).
 -- Untested as of 2026-11-23: every call is wrapped in pcall and logs its error, so a missing function shows up as ERR.
 local TAG = "[CrowdDiag] "
@@ -180,6 +182,53 @@ local function setCompTick(cls, on)
     log(string.format("comptick %s %s: %d of %d set, readback ticking=%d%s", cls, on and "on" or "off", n, total, still, err and (" ERR " .. tostring(err)) or ""))
 end
 
+-- Mesh ticks off only for avatars farther than <meters> from the local character (near ones keep animating).
+local function setTickFar(meters, on)
+    local me = FindFirstOf("BP_Biped_Player_C")
+    if not (me and me:IsValid()) then log("tickfar: no local player"); return end
+    local p, by, nAv, n, lim = me:K2_GetActorLocation(), meshesByOwner(), 0, 0, meters * 100
+    for _, av in ipairs(avatars()) do
+        if av:IsValid() then
+            local l = av:K2_GetActorLocation()
+            if math.sqrt((l.X - p.X) ^ 2 + (l.Y - p.Y) ^ 2 + (l.Z - p.Z) ^ 2) > lim then
+                nAv = nAv + 1
+                for _, c in ipairs(groupMeshes(av, by, "all8")) do
+                    remember(c, "tick", try(function() return c:IsComponentTickEnabled() end))
+                    if pcall(function() c:SetComponentTickEnabled(on) end) then n = n + 1 end
+                end
+            end
+        end
+    end
+    log(string.format("tickfar >%dm %s: %d avatars, %d meshes", meters, on and "on" or "off", nAv, n))
+end
+
+-- Skeletal mesh ticks of actors attached to a remote avatar (wand) and of actors a remote avatar is attached to (mount).
+local function setAttachTick(on)
+    local isAv = {}
+    for _, av in ipairs(avatars()) do if av:IsValid() then isAv[key(av)] = true end end
+    local owners, nHeld, nMount = {}, 0, 0
+    for _, a in ipairs(FindAllOf("Actor") or {}) do
+        if try(function() return a:IsValid() end) == true then
+            local par = try(function() return a:GetAttachParentActor() end)
+            if type(par) == "userdata" and try(function() return par:IsValid() end) == true then
+                if isAv[key(par)] then
+                    if not owners[key(a)] then owners[key(a)] = true; nHeld = nHeld + 1 end
+                elseif isAv[key(a)] then
+                    if not owners[key(par)] then owners[key(par)] = true; nMount = nMount + 1 end
+                end
+            end
+        end
+    end
+    local by, n = meshesByOwner(), 0
+    for k in pairs(owners) do
+        for _, c in ipairs(by[k] or {}) do
+            remember(c, "tick", try(function() return c:IsComponentTickEnabled() end))
+            if pcall(function() c:SetComponentTickEnabled(on) end) then n = n + 1 end
+        end
+    end
+    log(string.format("attachtick %s: %d held actors, %d mounts, %d meshes", on and "on" or "off", nHeld, nMount, n))
+end
+
 local function restore()
     local n = 0
     for _, r in pairs(orig) do
@@ -255,6 +304,8 @@ local function run(line)
     elseif c == "uro" then setProp(w[2], "bEnableUpdateRateOptimizations", w[3] == "on")
     elseif c == "hidden" then setHidden(w[2], w[3] == "on")
     elseif c == "comptick" then setCompTick(w[2], w[3] == "on")
+    elseif c == "tickfar" then setTickFar(tonumber(w[2]) or 50, w[3] == "on")
+    elseif c == "attachtick" then setAttachTick(w[2] == "on")
     elseif c == "lua" then local ok, e = pcall(dofile, DIR .. "Scripts\\" .. w[2]); log("lua " .. w[2] .. " -> " .. (ok and "ok" or ("ERR " .. tostring(e))))
     else log("unknown command: " .. line) end
 end

@@ -222,11 +222,91 @@ scripted characters filling the benches in front of and around the seat (35 idle
   on-screen count moved between 46 and 65); differences under about 1 ms are not meaningful. The comparison
   with Test 6 is across two client installs and two sessions a few hours apart.
 
+## Test 11: what real players are made of, and a CPU sampling trace (live, 2026-11-24 00:45-01:06)
+Read-only: a Lua inventory (`probe/crowddiag-inventory-ro.lua`, `probe/crowddiag-scripts/inventory_world_ro.lua`) plus a 63.5 s
+`wpr -start CPU` trace of the tester's own client on the public server. Nothing in the game was changed.
+
+- With 71-76 remote players loaded, 70 of them more than 50 m from the tester's character and 0-2 on screen:
+  38-39 FPS, game thread 95% (24-25 ms per frame), render thread 81% (21 ms), RHI 63% (16.5 ms), GPU 36-39%.
+- A later scan with finer buckets (24 players): 6 within 25 m, 1 at 50-100 m, 2 at 100-200 m, 13 at 200-500 m,
+  2 beyond 500 m. Players hundreds of metres away are fully built and update every frame.
+- A real player (mean of 72 with a body): 8.2 skeletal meshes, 3.6 of them ticking, about 970 bones,
+  18.8 materials; 219 distinct mesh assets across the crowd. The scripted mix of Test 10: 5.0 meshes, 2.8
+  ticking, 525 bones, 23 assets.
+- Levels of detail (`probe/crowddiag-scripts/lod_scan_ro.lua`, 23 players): of 226 skeletal mesh components on players,
+  141 have 5 LODs and 85 have ONE. Of the 107 that tick, 54 have 5 and 53 have one; the one-LOD meshes hold 48%
+  of the bones. The one-LOD assets are player-installed cosmetics (custom heads, hair, accessories). A one-LOD
+  mesh cannot drop detail with distance and `r.SkeletalMeshLODBias` has no effect on it.
+- Trace (mean 33.6 FPS, 57 players loaded): the game thread used 97% of one core. Where the CPU was: the game's
+  own code 77%, Windows kernel 10%, the multiplayer client's own code 5%. The game-code time is flat: half of it
+  is spread over 97 functions. Render thread: 86% game code. RHI thread: 46% game code, 28% GPU driver.
+  Limits: the launcher maps the game image in a way that defeats Windows stack walking, so only "where the CPU
+  was" is known, not "who asked for it"; and the trace itself cost about 15% of the frame rate, so the shares
+  are the result, not the absolute milliseconds.
+
+## Test 12: switching per-player updates off on real players (live, 2026-11-24 02:05-02:32)
+The diagnostic mod on the tester's own client, public server, 19-36 remote players loaded and drifting.
+Client-local switches only (other players freeze on the tester's screen, nobody else is affected), every step
+followed by a restore and a new baseline. 10 s settle + 40 s measure; FPS from the engine frame counter; ms =
+thread CPU per frame. Delta = step minus the mean of the two baselines around it.
+
+| Step | Players | FPS | Delta game | Delta render | Delta RHI |
+|---|---|---|---|---|---|
+| Baselines, round 1 | 19-25 | 58-67 | | | |
+| Mesh ticks off, all players | 22 | 72.5 | -1.5 | -3.2 | -2.5 |
+| Mesh ticks off, players beyond 50 m only | 21 | 70.4 | -0.85 | -2.5 | -1.5 |
+| Mesh ticks off, one-LOD meshes only (34 meshes; 18 of 20 body meshes) | 20 | 72.2 | -0.6 | -2.0 | -1.3 |
+| Mesh ticks off, five-LOD meshes only (46 meshes) | 20 | 66.4 | -1.2 | -0.55 | -0.4 |
+| Wand and mount mesh ticks off (22 meshes) | 20 | 61.7 | inside baseline drift | | |
+| Baselines, round 2 | 30-36 | 52-56 | | | |
+| Players beyond 50 m: mesh tick interval 0.2 s (138 meshes) | 35 | 63.4 | -2.2 | -5.2 | -3.2 |
+| Players beyond 100 m: mesh ticks off (229 meshes) | 34 | 66.6 | -3.0 | -4.5 | -3.3 |
+| Every per-player tick off (meshes, actor, movement, ability, managed, facial, overlap, wands) | 33 | 73.6 | -5.1 | -6.6 | -4.0 |
+| Baselines, round 3 | 20-33 | 51-67 | | | |
+| Mesh ticks off, all players | 26 | 71.4 | -1.0 | -4.1 | -2.3 |
+| Non-mesh ticks off (actor, movement, ability, managed, facial, overlap) | 20 | 70.1 | -1.4 | -1.3 | -0.4 |
+| Actor tick off | 24 | 65.8 | none | none | none |
+| Ability + managed character + facial ticks off | 33 | 52.1 | none | none | none |
+
+- The per-player cost is per-player updates. With every one of them off, 33 players cost 5.1 ms of game thread,
+  6.6 ms of render thread and 4.0 ms of RHI less: about 0.155 / 0.20 / 0.12 ms per player per frame.
+- Mesh updates are the render and RHI cost. On the game thread they share the cost with the non-mesh group;
+  actor, ability, managed-character and facial ticks show nothing, which leaves the movement component (its own
+  step was spoiled by a scene change and is not reported).
+- Players beyond 50 m carry most of the mesh cost, and they are not visible as individuals at that distance.
+  Updating their meshes 5 times a second instead of every frame recovers nearly as much as stopping them.
+- One-LOD meshes: switching them off gives nearly the whole render saving, the five-LOD meshes give little. Not
+  separated yet from the fact that most of them are the body mesh, which also drives the master-pose followers.
+- Limits: one measurement per step; the crowd changed between steps (the Players column is the count at each
+  step); game-thread deltas for the same switch varied between 1 and 3 ms across rounds. The client had an
+  experimental UI change applied during this test and Test 13 (lower UI frame rate), not during Test 11.
+
+## Test 13: CrowdFix with the far-player interval (live, 2026-11-24 02:33-02:37)
+New settings: `fardistance=5000` (cm) and `farinterval=0.2` (s). Every ticking skeletal mesh of a player beyond
+`fardistance` gets that component tick interval; it is put back when the player comes closer or the mod is
+switched off. Same session as Test 12, 30-38 players, 15 s settle + 40 s measure.
+
+| State | FPS | Game | Render | RHI | Read-back |
+|---|---|---|---|---|---|
+| Off | 54.2 | 16.42 | 17.60 | 14.06 | |
+| Far interval only (URO distance out of range) | 58.4 | 15.41 | 15.27 | 12.57 | 23 players slowed |
+| Off | 56.1 | 15.87 | 16.64 | 13.98 | |
+| Shipped defaults (URO beyond 25 m + far interval beyond 50 m) | 66.1 | 12.98 | 12.86 | 11.66 | 27 on URO, 26 slowed |
+| Off | 58.6 | 14.73 | 15.76 | 13.56 | |
+
+- Shipped defaults: +8.8 FPS (+15%), game -2.3 ms, render -3.3 ms, RHI -2.1 ms. Far interval alone: +3.3 FPS
+  with 23 far players (Test 12 measured +10.6 FPS when 34 were far): the gain follows the number of far players.
+- The mod logged no errors and read the interval back from the game (0.20 s).
+- Limits: one measurement per state, on one PC, with at most 38 players loaded; not yet repeated in a full
+  server. The visual effect on far players was accepted by the tester without a line of sight to them.
+
 ## Result
 Recipe: `r.SkeletalMeshLODBias=2` (Engine.ini) + URO on the remote body mesh beyond 25 m +
-`a.URO.ForceInterpolation 1` + `a.URO.ForceAnimRate 2`. Nearby players are untouched.
-For the mod team: the same can be done inside the client (opt remote avatars' body mesh into URO
-beyond ~25 m with interpolation and a rate cap), with no add-on.
+`a.URO.ForceInterpolation 1` + `a.URO.ForceAnimRate 2` + a 0.2 s mesh tick interval for players beyond 50 m.
+Nearby players are untouched.
+For the mod team: the same can be done inside the client with no add-on. The larger fix is on the same line:
+remote players that are far away or not visible should not be animated every frame (Tests 11-13), and players
+hundreds of metres away are currently fully built.
 
 ## Known limits
 - `a.URO.ForceAnimRate 2` is global: game NPCs that already use URO also update every second frame.
@@ -234,7 +314,9 @@ beyond ~25 m with interpolation and a rate cap), with no add-on.
 - Tested on one PC (Ryzen 9 5900XT, RTX 5060 Ti), on a local server and in two live sessions on one public
   server (Test 6); single runs per setting, phase noise about +-3 FPS.
 - The 56.8 -> 61.1 "recipe" gain (Test 5) is a single run near the noise level and did not repeat in rooms.
-- Not approved by ArcaneMP yet; it needs UE4SS loaded after the menu (late injection).
+- Not an official ArcaneMP feature; it needs UE4SS loaded after the menu (late injection).
+- "A real player costs three times a scripted one" (Test 10) is not established: the scripted figure came from
+  a mixed cohort and the live figure from two different places. Test 12 measures the live per-player cost directly.
 
 ## Files
 - `CrowdFix/`: the Lua mod (`Scripts/main.lua`, `settings.txt`).
@@ -244,4 +326,12 @@ beyond ~25 m with interpolation and a rate cap), with no add-on.
   `probe/crowddiag-rendered.lua`, `probe/crowddiag-where.lua`: helper reads it runs with its `lua` command.
   `probe/crowddiag-inventory-ro.lua`: read-only inventory of what a remote avatar is made of.
 - `../test-harness/scripts/ablate.ps1`: the step driver of Tests 9-10 (commands, settle, FPS and thread CPU).
+- `probe/crowddiag-scripts/`: scripts the diagnostic mod runs with its `lua` command, under the file names they
+  need in its `Scripts` folder. `inventory_world_ro.lua`, `lod_names_ro.lua`, `lod_scan_ro.lua`: the read-only
+  scans of Test 11. `ticklod*.lua`, `farint*.lua`: the per-LOD and far-interval switches of Test 12.
+- `probe/crowdinv-main.lua`: the read-only mod of Test 11 (runs the two inventories on request and prints the
+  frame counter every 5 s, which the live drivers read).
+- `../test-harness/scripts/live-ablate.ps1`: the step driver of Test 12 (no local server needed; FPS from the
+  frame counter the scan mod prints). `../test-harness/scripts/live-crowdfix-ab.ps1`: the on/off run of Test 13.
+- Not in the repository: the trace reader used for Test 11's sampling numbers.
 - Release asset `arcanemp-crowdfix-addon-test.zip` = these files + UE4SS v4.0.0 (MIT licence).

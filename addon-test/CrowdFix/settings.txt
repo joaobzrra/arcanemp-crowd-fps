@@ -2,3 +2,5 @@ enabled=1
 distance=2500
 interpolate=1
 animrate=2
+fardistance=5000
+farinterval=0.2

@@ -8,13 +8,15 @@
 --   animrate=2       a.URO.ForceAnimRate (URO players update every N frames; 0 = engine default)
 --   shadows=0        cm; players farther than this stop casting shadows (all their meshes). 0 = keep all shadows
 --   cloth=0          cm; players farther than this get cloth simulation paused (all their meshes). 0 = never
+--   fardistance=5000 cm; players farther than this have their meshes animate only every `farinterval` seconds
+--   farinterval=0.2  seconds between animation updates of those far players (0.2 = 5 per second). 0 = feature off
 -- Measured on ArcaneMP 1.15.1 (100 test characters, 15-50 m): see the repository README.
 local MOD_DIR = debug.getinfo(1, "S").source:match("@?(.*[\\/])Scripts[\\/]") or ""
 local TAG = "[CrowdFix] "
 local BATCH, STEP_MS, RESCAN_S = 10, 250, 10
 
 local function readSettings()
-    local s = { enabled = 1, distance = 2500, interpolate = 1, animrate = 2, shadows = 0, cloth = 0 }
+    local s = { enabled = 1, distance = 2500, interpolate = 1, animrate = 2, shadows = 0, cloth = 0, fardistance = 5000, farinterval = 0.2 }
     local f = io.open(MOD_DIR .. "settings.txt", "r")
     if f then
         for line in f:lines() do
@@ -50,7 +52,10 @@ local shadowOff = {}        -- avatar address -> true when its meshes do not cas
 local origShadow = {}       -- mesh address -> CastShadow value before CrowdFix touched it
 local meshesOf = {}         -- avatar address -> its skeletal mesh components
 local me, lastLine, loggedShadow = nil, "", false
-local stats = { far = 0, near = 0, noShadow = 0, noCloth = 0, uroOn = 0, maxStepMs = 0 }
+local stats = { far = 0, near = 0, noShadow = 0, noCloth = 0, uroOn = 0, slow = 0, maxStepMs = 0 }
+local farSlow, farGen = {}, {}   -- avatar address -> true while its meshes run at the far interval / mesh-scan number it was applied at
+local origInterval = {}          -- mesh address -> tick interval before CrowdFix touched it
+local scanGen, loggedFar = 0, false
 
 local function key(o) local ok, a = pcall(function() return o:GetAddress() end); return ok and a or tostring(o) end
 
@@ -72,6 +77,36 @@ local function mapMeshes()
                 end
             end
         end
+    end
+    for ck in pairs(origInterval) do if not seen[ck] then origInterval[ck] = nil end end
+    scanGen = scanGen + 1
+end
+
+-- Far players: each of their ticking skeletal meshes updates its animation only every cfg.farinterval seconds.
+-- Coming back inside the distance (or switching the mod off) puts every mesh back to its own interval.
+local function setFarInterval(avKey, on)
+    local n, first = 0, nil
+    for _, c in ipairs(meshesOf[avKey] or {}) do
+        if c:IsValid() then
+            local ck = key(c)
+            if on then
+                local okT, ticking = pcall(function() return c:IsComponentTickEnabled() end)
+                if okT and ticking then
+                    if origInterval[ck] == nil then
+                        local okI, v = pcall(function() return c:GetComponentTickInterval() end)
+                        origInterval[ck] = okI and v or 0
+                    end
+                    if pcall(function() c:SetComponentTickInterval(cfg.farinterval) end) then n = n + 1; first = first or c end
+                end
+            elseif origInterval[ck] ~= nil then
+                pcall(function() c:SetComponentTickInterval(origInterval[ck]) end)
+                origInterval[ck] = nil
+            end
+        end
+    end
+    if on and first and not loggedFar then
+        loggedFar = true
+        print(string.format("%sfar check: %d meshes of one far player set, first interval now %.2fs\n", TAG, n, first:GetComponentTickInterval()))
     end
 end
 
@@ -110,17 +145,17 @@ local function startSweep(full)
         -- Forget players that despawned, so their old entries do not keep the mesh scan running.
         local live = {}
         for _, av in ipairs(list) do live[key(av)] = true end
-        for _, t in ipairs({ applied, shadowOff, clothOff }) do
+        for _, t in ipairs({ applied, shadowOff, clothOff, farSlow, farGen }) do
             for k in pairs(t) do if not live[k] then t[k] = nil end end
         end
-        if cfg.shadows > 0 or cfg.cloth > 0 or next(shadowOff) or next(clothOff) then mapMeshes() end
+        if cfg.shadows > 0 or cfg.cloth > 0 or cfg.farinterval > 0 or next(shadowOff) or next(clothOff) or next(farSlow) then mapMeshes() end
     end
     local p = FindFirstOf("BP_Biped_Player_C")
     me = (p and p:IsValid()) and p:K2_GetActorLocation() or nil
     cfg = readSettings()
     applyCvars()
     idx = 1
-    stats.far, stats.near, stats.noShadow, stats.noCloth, stats.uroOn = 0, 0, 0, 0, 0
+    stats.far, stats.near, stats.noShadow, stats.noCloth, stats.uroOn, stats.slow = 0, 0, 0, 0, 0, 0
 end
 
 LoopAsync(STEP_MS, function()
@@ -132,13 +167,14 @@ LoopAsync(STEP_MS, function()
             for i = idx, stop do
                 local av = list[i]
                 if av and av:IsValid() then
-                    local far, noShadow = false, false
+                    local far, noShadow, slow = false, false, false
                     if cfg.enabled == 1 and me then
                         local l = av:K2_GetActorLocation()
                         local dx, dy, dz = l.X - me.X, l.Y - me.Y, l.Z - me.Z
                         local d2 = dx * dx + dy * dy + dz * dz
                         far = d2 >= cfg.distance * cfg.distance
                         noShadow = cfg.shadows > 0 and d2 >= cfg.shadows * cfg.shadows
+                        slow = cfg.farinterval > 0 and cfg.fardistance > 0 and d2 >= cfg.fardistance * cfg.fardistance
                     end
                     if far then stats.far = stats.far + 1 else stats.near = stats.near + 1 end
                     local k = key(av)
@@ -174,14 +210,21 @@ LoopAsync(STEP_MS, function()
                         clothOff[k] = noCloth or nil
                     end
                     if clothOff[k] then stats.noCloth = stats.noCloth + 1 end
+                    -- Re-applied after every mesh scan, so clothes a far player put on later are covered too.
+                    if meshesOf[k] and #meshesOf[k] > 0 and ((farSlow[k] or false) ~= slow or (slow and farGen[k] ~= scanGen)) then
+                        setFarInterval(k, slow)
+                        farSlow[k] = slow or nil
+                        farGen[k] = slow and scanGen or nil
+                    end
+                    if farSlow[k] then stats.slow = stats.slow + 1 end
                 end
             end
             idx = stop + 1
             local ms = (os.clock() - t0) * 1000
             if ms > stats.maxStepMs then stats.maxStepMs = ms end
             if idx > #list and #list > 0 then
-                local line = string.format("enabled=%d distance=%dcm shadows=%dcm cloth=%dcm players near=%d far=%d uroOn(readback)=%d noShadow=%d noCloth=%d slowestStep=%.1fms",
-                    cfg.enabled, cfg.distance, cfg.shadows, cfg.cloth, stats.near, stats.far, stats.uroOn, stats.noShadow, stats.noCloth, stats.maxStepMs)
+                local line = string.format("enabled=%d distance=%dcm shadows=%dcm cloth=%dcm fardistance=%dcm farinterval=%.2fs players near=%d far=%d uroOn(readback)=%d noShadow=%d noCloth=%d slowAnim=%d slowestStep=%.1fms",
+                    cfg.enabled, cfg.distance, cfg.shadows, cfg.cloth, cfg.fardistance, cfg.farinterval, stats.near, stats.far, stats.uroOn, stats.noShadow, stats.noCloth, stats.slow, stats.maxStepMs)
                 if line ~= lastLine then print(TAG .. line .. "\n"); lastLine = line end
                 stats.maxStepMs = 0
             end

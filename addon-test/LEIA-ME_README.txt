@@ -15,6 +15,8 @@ Teste: 100 personagens espalhados de 15 a 50 m, junto com a correcao de LOD
 3. A janela avisa "CrowdFix loaded" cerca de 30 s depois que o jogo abre.
 Para desligar: feche o jogo. Nada fica instalado.
 Ajustes: ue4ss\Mods\CrowdFix\settings.txt (distance em cm, enabled=0 desliga).
+Novo: jogadores a mais de 50 m (fardistance=5000) animam so 5 vezes por segundo
+(farinterval=0.2; farinterval=0 desliga). Teste ao vivo, 30-38 jogadores: 57 -> 66 FPS.
 
 ENGLISH
 What it does: players farther than 25 m animate with fewer updates (Unreal's own
@@ -28,6 +30,8 @@ Test: 100 characters spread 15-50 m, together with the LOD fix
 3. The window prints "CrowdFix loaded" about 30 s after the game opens.
 To stop: close the game. Nothing stays installed.
 Settings: ue4ss\Mods\CrowdFix\settings.txt (distance in cm, enabled=0 turns it off).
+New: players farther than 50 m (fardistance=5000) animate only 5 times a second
+(farinterval=0.2; farinterval=0 turns it off). Live test, 30-38 players: 57 -> 66 FPS.
 
 Known: a.URO.ForceAnimRate=2 also applies to game NPCs that use URO.
 Includes UE4SS v4.0.0 (MIT licence, github.com/UE4SS-RE/RE-UE4SS, see ue4ss\LICENSE).

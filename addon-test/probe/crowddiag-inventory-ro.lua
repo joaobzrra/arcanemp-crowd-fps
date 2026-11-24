@@ -81,7 +81,11 @@ for _, p in pairs(per) do
     for k, v in pairs(p) do sum[k] = sum[k] + v end
     bump(skDist, string.format("%02d", p.sk)); bump(tickDist, string.format("%02d", p.skTick))
 end
-local n = #avs
+-- Divide by the avatars that own at least one component: some avatar objects are empty shells (not built yet,
+-- or being removed) and would dilute every mean.
+local n = 0; for _ in pairs(per) do n = n + 1 end
+log(string.format("avatar objects found %d, with components %d (the means below use the second number)", #avs, n))
+if n == 0 then log("END (no avatar owns a component)"); return end
 log(string.format("per avatar (mean of %d): components %.1f (ticking %.1f) | skeletal meshes %.1f (ticking %.1f, anim instance %.1f, post-process %.1f, master-pose follower %.1f) | bones %.0f | materials %.1f | static meshes %.1f | widgets %.1f | attached actors %.2f",
     n, sum.comps / n, sum.ticking / n, sum.sk / n, sum.skTick / n, sum.anim / n, sum.post / n, sum.master / n, sum.bones / n, sum.mats / n, sum.st / n, sum.widgets / n, nAtt / n))
 log("skeletal meshes per avatar (count=avatars): " .. top(skDist, 20))
