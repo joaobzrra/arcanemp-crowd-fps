@@ -31,7 +31,8 @@ Do **not** add `p.ClothPhysics=0`: it crashes the client on teleport.
 
 ArcaneMP has its own settings, separate from the normal game, and some servers lock the in-game settings menu.
 [settings-copy/](settings-copy/) copies the normal game's settings into ArcaneMP with one double-click, with
-frame generation switched off, and can undo it.
+frame generation switched off, and can undo it. It ships in the same `arcanemp-crowd-fix.zip`
+(`copy-settings.bat`, `restore-settings.bat`).
 
 ## Add-on test (CrowdFix, UE4SS)
 

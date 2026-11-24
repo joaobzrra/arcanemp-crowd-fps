@@ -12,6 +12,8 @@ ArcaneMP copy, so a change made in the normal game does not reach the server.
 
 ## Use
 
+Both files are in `arcanemp-crowd-fix.zip` on Releases (v1.1 and later), next to the crowd fix.
+
 1. Start Hogwarts Legacy **without** ArcaneMP, set graphics, camera, sound and HUD the way you want, quit.
 2. Double-click `copy-settings.bat`.
 3. Join the server as usual.
