@@ -27,6 +27,12 @@ under `[SystemSettings]` and keeps a copy as `Engine.ini.before-crowdfix`. It re
 
 Do **not** add `p.ClothPhysics=0`: it crashes the client on teleport.
 
+## Settings on servers that lock the menu
+
+ArcaneMP has its own settings, separate from the normal game, and some servers lock the in-game settings menu.
+[settings-copy/](settings-copy/) copies the normal game's settings into ArcaneMP with one double-click, with
+frame generation switched off, and can undo it.
+
 ## Add-on test (CrowdFix, UE4SS)
 
 The config fix above only helps the render thread. A separate test add-on lowers the game-thread cost of
