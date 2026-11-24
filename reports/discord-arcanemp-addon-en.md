@@ -14,12 +14,12 @@ LODBias=2 only                    56.8   27 ms
 + ForceInterpolation + AnimRate 2 61.1   26 ms   no visible stutter
 ```
 **What did NOT work**
-- Tick interval on all 8 meshes: +95% FPS, but hair detaches and the walk looks like ~20 FPS.
+- Tick interval 0.1 s on all 8 meshes: +50% FPS (40 -> 60); with URO on all 8 as well, +95% (78). But hair detaches and the walk looks like ~20 FPS.
 - URO starting at 5-10 m: visible stutter. 25 m is the comfortable distance.
 - `SetForcedLOD` per mesh: no gain (something overrides it).
 
 **Suggested change in the client**
-Opt remote avatars' body mesh into URO beyond ~25 m, with interpolation and a rate cap. Same result, no add-on needed. Combined with LOD bias for distant players, our test went from ~39 to ~61 FPS with 100 players.
+Opt remote avatars' body mesh into URO beyond ~25 m, with interpolation and a rate cap. Same result, no add-on needed. (Correction: an earlier version said ~39 to ~61 FPS; that mixed a compact-crowd baseline with a spread-crowd result. The measured add-on gain on top of LOD bias was 56.8 to 61.1 in one spread run, and none in rooms.)
 
 Add-on source, test data and loader: https://github.com/joaobzrra/arcanemp-crowd-fps/tree/main/addon-test
 The add-on needs UE4SS loaded after the menu (late injection). Is that acceptable to you, or would you rather add this to the client?

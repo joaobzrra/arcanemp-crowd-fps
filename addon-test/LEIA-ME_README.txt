@@ -8,7 +8,9 @@ O que faz: jogadores a mais de 25 m passam a animar com menos atualizacoes
 (otimizacao do proprio Unreal, URO), com suavizacao. Jogadores perto nao mudam.
 Teste: 100 personagens espalhados de 15 a 50 m, junto com a correcao de LOD
 (r.SkeletalMeshLODBias=2): 56,8 -> 61 FPS estaveis, sem travadas visiveis.
-1. Rode start-crowdfix.bat (antes ou depois de abrir o jogo).
+1. Rode start-crowdfix.bat (antes ou depois de abrir o jogo) e escolha o modo:
+   1 Ultra Performance (10 m), 2 Performance (15 m), 3 Balanced (20 m), 4 Quality (25 m).
+   PC fraco: 1 ou 2. Rodar de novo com o jogo aberto so troca o modo.
 2. Abra o jogo normalmente (Forge ou launcher do ArcaneMP).
 3. A janela avisa "CrowdFix loaded" cerca de 30 s depois que o jogo abre.
 Para desligar: feche o jogo. Nada fica instalado.
@@ -19,7 +21,9 @@ What it does: players farther than 25 m animate with fewer updates (Unreal's own
 update-rate optimisation, URO), with interpolation. Nearby players are untouched.
 Test: 100 characters spread 15-50 m, together with the LOD fix
 (r.SkeletalMeshLODBias=2): 56.8 -> stable 61 FPS, no visible stutter.
-1. Run start-crowdfix.bat (before or after starting the game).
+1. Run start-crowdfix.bat (before or after starting the game) and pick a preset:
+   1 Ultra Performance (10 m), 2 Performance (15 m), 3 Balanced (20 m), 4 Quality (25 m).
+   Weak PC: 1 or 2. Running it again while the game is open only switches the preset.
 2. Start the game as usual (Forge or ArcaneMP launcher).
 3. The window prints "CrowdFix loaded" about 30 s after the game opens.
 To stop: close the game. Nothing stays installed.

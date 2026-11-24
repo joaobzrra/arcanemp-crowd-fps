@@ -230,6 +230,86 @@ function startHeavy(playerlike) {
   }, HEAVY_TICK_MS);
 }
 
+// "scene": a live RP server as measured on CHRONIX (2026-11-23): the client held 60-71 remote players, most
+// within 10 m (classroom / hall), with the rest of a 248/250 server farther away. SCENE_NEAR bodies in a
+// room-sized disc doing room things, the remainder walking 30-100 m out; the server's own streaming decides
+// how many of those reach the client.
+const SCENE_NEAR = 65;
+const SCENE_NEAR_CM = 1000;
+const SCENE_FAR_MIN_CM = 3000;
+const SCENE_FAR_MAX_CM = 10000;
+
+function spawnScene(player, count, look, useLook) {
+  const origin = player.position;
+  const nNear = Math.min(SCENE_NEAR, count);
+  let ok = 0, failed = 0, firstError = "";
+  const roles = { idle: 0, sit: 0, pace: 0, cast: 0, far: 0 };
+  for (let i = 0; i < count; i++) {
+    const near = i < nNear;
+    const ang = Math.random() * 2 * Math.PI;
+    const dist = near ? 150 + Math.sqrt(Math.random()) * (SCENE_NEAR_CM - 150)
+                      : SCENE_FAR_MIN_CM + Math.random() * (SCENE_FAR_MAX_CM - SCENE_FAR_MIN_CM);
+    const p = { x: origin.x + Math.cos(ang) * dist, y: origin.y + Math.sin(ang) * dist, z: origin.z };
+    const yaw = ((ang * 180) / Math.PI + 180) % 360;   // near ones face the player, like a class facing a teacher
+    const key = `crowd-${i}`;
+    try {
+      const b = bodyFor(i, useLook ? look : null, 0);
+      const c = Character.create(key, b.id, Object.assign({ x: p.x, y: p.y, z: p.z, yaw }, b.extra));
+      if (!c) { failed++; continue; }
+      const r = i % 20;
+      const role = !near ? "far" : r < 10 ? "idle" : r < 14 ? "sit" : r < 17 ? "pace" : "cast";
+      const m = { key, c, index: i, yaw, home: p, nextAt: Date.now() + 10000 + Math.random() * 15000, variant: 0, playerlike: true, extras: [], role };
+      crowd.push(m);
+      dressUp(m);
+      roles[role]++;
+      ok++;
+      const movable = Character.isMovable(b.id);
+      if (role === "sit") {
+        c.playClip(SIT_CLIPS[i % SIT_CLIPS.length], { loop: true });
+      } else if (role === "pace" && movable) {
+        const a2 = Math.random() * 2 * Math.PI, d2 = 200 + Math.random() * 100;
+        c.moveAlong([
+          { x: p.x + Math.cos(a2) * d2, y: p.y + Math.sin(a2) * d2, z: p.z, wait: 8 + (i % 8) },
+          { x: p.x, y: p.y, z: p.z, wait: 8 + ((i + 3) % 8) },
+        ], { loop: "loop" });
+      } else if (role === "far" && movable) {
+        const a2 = Math.random() * 2 * Math.PI, d2 = 1000 + Math.random() * 1000;
+        c.moveAlong([
+          { x: p.x + Math.cos(a2) * d2, y: p.y + Math.sin(a2) * d2, z: p.z, wait: i % 4 },
+          { x: p.x, y: p.y, z: p.z, wait: (i + 2) % 4 },
+        ], { loop: "loop" });
+      }
+    } catch (e) {
+      failed++;
+      if (!firstError) firstError = String(e && e.message ? e.message : e);
+    }
+  }
+  // Casters: a cast clip and a magic effect every 10-25 s.
+  if (magicFx.length === 0) loadMagicFx();
+  heavyTimer = setInterval(() => {
+    const t = Date.now();
+    for (const m of crowd) {
+      if (m.role !== "cast" || t < m.nextAt) continue;
+      m.nextAt = t + 10000 + Math.random() * 15000;
+      try {
+        m.c.playClip(CAST_CLIPS[Math.floor(Math.random() * CAST_CLIPS.length)], { loop: false, hold: false });
+        stats.casts++;
+        if (magicFx.length > 0) {
+          const q = m.c.position || m.home;
+          Fx.create(`crowdfx-${fxCounter++}`, magicFx[Math.floor(Math.random() * magicFx.length)], { x: q.x, y: q.y, z: q.z + 100, ttl: 3 });
+          stats.fx++;
+        }
+      } catch (e) {
+        stats.actErrors++;
+        if (!stats.firstActError) { stats.firstActError = String(e && e.message ? e.message : e); log(`scene action error: ${stats.firstActError}`); }
+      }
+    }
+  }, HEAVY_TICK_MS);
+  log(`scene spawned ${ok}/${count}: idle ${roles.idle} sit ${roles.sit} pace ${roles.pace} cast ${roles.cast} far ${roles.far}` +
+    (failed ? `, ${failed} failed: ${firstError}` : ""));
+  return { ok, failed, useLook };
+}
+
 function spawnCrowd(player, count, mode, dress) {
   clearCrowd();
   if (count <= 0) return { ok: 0, failed: 0, useLook: false };
@@ -237,6 +317,7 @@ function spawnCrowd(player, count, mode, dress) {
   crowdCentre = { x: origin.x, y: origin.y, z: origin.z };
   const look = dress === "look" ? player.getLook() : null;
   const useLook = !!(look && look.presets && Object.keys(look.presets).length > 0);
+  if (mode === "scene") return spawnScene(player, count, look, useLook);
   let ok = 0;
   let failed = 0;
   let firstError = "";
@@ -421,7 +502,7 @@ function handleCommand(command, args) {
   }
   if (cmd !== "crowdrun") return;
   const requested = String((args && args[0]) || "walk").toLowerCase();
-  const mode = ["walk", "walknamed", "stand", "heavy", ...PLAYERLIKE].includes(requested) ? requested : "walk";
+  const mode = ["walk", "walknamed", "stand", "heavy", "scene", ...PLAYERLIKE].includes(requested) ? requested : "walk";
   const schedule = args && args[1] ? String(args[1]).split(",").map(Number).filter(n => Number.isFinite(n) && n >= 0 && n <= MAX_CROWD) : null;
   const online = PlayerManager.getAll();
   if (online.length === 0) { log("crowdrun: nobody online"); return; }
