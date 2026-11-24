@@ -37,8 +37,8 @@ Test build, not approved by ArcaneMP yet. All tests, numbers and visual verdicts
 
 ## Frame generation
 
-ArcaneMP 1.15.1 turns frame generation off at every start. Eight launches with it kept on (NVIDIA DLSS,
-AMD FSR 3, Intel XeSS and the driver-level NVIDIA Smooth Motion) all fail once the mod's overlay starts.
+ArcaneMP 1.15.1 turns frame generation off at every start. Eight test runs with it kept selected (NVIDIA
+DLSS, AMD FSR 3, Intel XeSS and the driver-level NVIDIA Smooth Motion) all fail.
 Results, errors, logs and crash report extracts: [frame-generation/](frame-generation/).
 
 ## For modders
