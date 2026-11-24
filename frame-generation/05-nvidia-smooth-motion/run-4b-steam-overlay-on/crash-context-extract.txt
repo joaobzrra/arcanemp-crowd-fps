@@ -1,0 +1,77 @@
+[export] Extract of the game's CrashContext.runtime-xml. Only the fields below are copied; account, login and machine identifiers, the full module paths and the memory dump are not published.
+CrashType: Crash
+ErrorMessage: Unhandled exception
+IsAssert: false
+IsEnsure: false
+SecondsSinceStart: 23
+GameName: UE4-Phoenix
+EngineVersion: 4.27.2-2153883+++stream+Main_TeamCity_Code
+BuildVersion: 1.0.2153883
+BuildConfiguration: Shipping
+CommandLine: -dx12 -SaveToUserDir -UserDir="Hogwarts Legacy\ArcaneMP" -SkipEpilepsy
+GameStateName: GameState
+RHI.RHIName: D3D12
+RHI.AdapterName: NVIDIA GeForce RTX 5060 Ti
+RHI.UserDriverVersion: 621.24
+RHI.InternalDriverVersion: 32.0.16.2124
+RHI.DriverDate: 11-7-2026
+RHI.FeatureLevel: SM5
+Misc.CPUBrand: AMD Ryzen 9 5900XT 16-Core Processor
+Misc.OSVersionMajor: Windows 10 Enterprise (Build 26300, Version 26H2)
+
+Portable call stack (crash point):
+    gameoverlayrenderer64+0xCB2D2
+    gameoverlayrenderer64+0x9C204
+    ArcaneMPClient+0x2518A3
+    NvPresent64+0x4A944
+    NvPresent64+0x32E7C
+    NvPresent64+0x342C4
+    NvPresent64+0x11FEA
+    NvPresent64+0x4A64F
+    HogwartsLegacy+0x3F9F496
+    HogwartsLegacy+0x3F9F2A5
+    HogwartsLegacy+0x3FA10E8
+    HogwartsLegacy+0x4F658FB
+    HogwartsLegacy+0x4F65EFB
+    HogwartsLegacy+0x390638B
+    HogwartsLegacy+0x4FA60CB
+    HogwartsLegacy+0x3A58AA7
+    HogwartsLegacy+0x3A52BD1
+    KERNEL32+0x2DDA7
+    ntdll+0xC9C5C
+
+Crashed thread: RHIThread
+    ntdll+0x166464
+    KERNELBASE+0x1427F
+    HogwartsLegacy+0x621CEA4
+    HogwartsLegacy+0x3A45B40
+    ArcaneMPClient+0x23972D
+    ArcaneMPClient+0x2396AB
+    HogwartsLegacy+0x689F15E
+    VCRUNTIME140+0x1A9C0
+    ntdll+0x16AB3F
+    ntdll+0xC6985
+    ntdll+0x16A47E
+    gameoverlayrenderer64+0x8192F
+    gameoverlayrenderer64+0xCA0CD
+    gameoverlayrenderer64+0xCB2D2
+    gameoverlayrenderer64+0x9C204
+    ArcaneMPClient+0x2518A3
+    NvPresent64+0x4A944
+    NvPresent64+0x32E7C
+    NvPresent64+0x342C4
+    NvPresent64+0x11FEA
+    NvPresent64+0x4A64F
+    HogwartsLegacy+0x3F9F496
+    HogwartsLegacy+0x3F9F2A5
+    HogwartsLegacy+0x3FA10E8
+    HogwartsLegacy+0x4F658FB
+    HogwartsLegacy+0x4F65EFB
+    HogwartsLegacy+0x390638B
+    HogwartsLegacy+0x4FA60CB
+    HogwartsLegacy+0x3A58AA7
+    HogwartsLegacy+0x3A52BD1
+    KERNEL32+0x2DDA7
+    ntdll+0xC9C5C
+
+Modules listed in the crash context (file names only): amd_fidelityfx_dx12.dll, AnselSDK64.dll, CChromaEditorLibrary64.dll, dbghelp.dll, EOSSDK-Win64-Shipping.dll, GfnRuntimeSdk.dll, GFSDK_Aftermath_Lib.x64.dll, HogwartsLegacy.exe, libogg_64.dll, libvorbis_64.dll, libvorbisfile_64.dll, libxell.dll, libxess.dll, libxess_fg.dll, nvngx_deepdvc.dll, nvngx_dlss.dll, nvngx_dlssd.dll, nvngx_dlssg.dll, nvngx_dlssnr.dll, sl.common.dll, sl.deepdvc.dll, sl.dlss_g.dll, sl.dlss_nr.dll, sl.interposer.dll, sl.pcl.dll, sl.reflex.dll, steam_api64.dll, XAudio2_9Redist.dll

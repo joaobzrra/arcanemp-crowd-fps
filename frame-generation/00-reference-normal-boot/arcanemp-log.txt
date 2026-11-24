@@ -1,0 +1,140 @@
+[export] ArcaneMP client log, boot started 2026-11-24 12:11:06 (local time). Personal data replaced by placeholders.
+[export] 1116 '[AOB] [trace]' pattern-resolution lines removed.
+[2026-11-24 12:11:06.807] [Client] [info] ArcaneMP 1.15.1 (b8ce055)
+[2026-11-24 12:11:06.858] [Client] [info] Crash reporting installed at entry point
+[2026-11-24 12:11:06.858] [Hooks] [info] reserved 4 trampoline blocks below the image at 0x140000000
+[2026-11-24 12:11:06.900] [Client] [info] Armed post-unpack ArcaneMP client initialization
+[2026-11-24 12:11:07.212] [Client] [info] Reached post-unpack CRT boundary; starting ArcaneMP client
+[2026-11-24 12:11:07.213] [Hooking] [info] Pattern table seeded 2242 addresses
+[2026-11-24 12:11:07.215] [AOB] [info] resolved 1114/1114 patterns, 0 stale, 0 optional-missing, 0 not on this build (Steam buildid 20773316 (2025-12-21))
+[2026-11-24 12:11:07.216] [Client] [debug] Running module: StoryScenes
+[2026-11-24 12:11:07.218] [Client] [debug] Running module: World
+[2026-11-24 12:11:07.218] [Client] [debug] Running module: FreerideLoader
+[2026-11-24 12:11:07.218] [Client] [debug] Running module: WorldLifecycle
+[2026-11-24 12:11:07.220] [Client] [debug] Running module: UiNativeSignals
+[2026-11-24 12:11:07.220] [Client] [debug] Running module: UiNativePauseMenu
+[2026-11-24 12:11:07.220] [Client] [debug] Running module: Train
+[2026-11-24 12:11:07.221] [Client] [debug] Running module: FastTravelGate
+[2026-11-24 12:11:07.221] [Client] [debug] Running module: WandGlow
+[2026-11-24 12:11:07.221] [Client] [debug] Running module: StateEffects
+[2026-11-24 12:11:07.223] [Client] [debug] Running module: SpellLearning
+[2026-11-24 12:11:07.223] [Client] [debug] Running module: ProtegoLockGate
+[2026-11-24 12:11:07.223] [Client] [debug] Running module: SpellDefinitions
+[2026-11-24 12:11:07.224] [Client] [debug] Running module: SpellCast
+[2026-11-24 12:11:07.224] [Client] [debug] Running module: SpellAssignment
+[2026-11-24 12:11:07.224] [Client] [debug] Running module: SuspendEnemiesGuard
+[2026-11-24 12:11:07.224] [SuspendEnemiesGuard] [info] Suspend-enemies guard installed
+[2026-11-24 12:11:07.224] [Client] [debug] Running module: PlayerSpeaker
+[2026-11-24 12:11:07.225] [Speaker] [info] dialogue hooks: caption=true voice=true
+[2026-11-24 12:11:07.225] [Client] [debug] Running module: PlayerController
+[2026-11-24 12:11:07.225] [Client] [debug] Running module: PlayerMoveStick
+[2026-11-24 12:11:07.226] [Client] [debug] Running module: DownedProbe
+[2026-11-24 12:11:07.226] [Client] [debug] Running module: CapsuleGuard
+[2026-11-24 12:11:07.228] [CapsuleGuard] [info] Capsule guard installed
+[2026-11-24 12:11:07.228] [Client] [debug] Running module: CamShakeGuard
+[2026-11-24 12:11:07.228] [CamShakeGuard] [info] Cam-shake guard installed
+[2026-11-24 12:11:07.228] [Client] [debug] Running module: BodyLeanGuard
+[2026-11-24 12:11:07.229] [Client] [debug] Running module: BipedPlayerGuard
+[2026-11-24 12:11:07.230] [Client] [debug] Running module: NpcWeaponFire
+[2026-11-24 12:11:07.230] [Client] [debug] Running module: SpawnerRegistration
+[2026-11-24 12:11:07.231] [Client] [debug] Running module: NpcPriorityTarget
+[2026-11-24 12:11:07.231] [Client] [debug] Running module: AmbientPopulation
+[2026-11-24 12:11:07.232] [Client] [debug] Running module: NpcMoveEnterTree
+[2026-11-24 12:11:07.232] [Client] [debug] Running module: NpcKillReward
+[2026-11-24 12:11:07.233] [Client] [debug] Running module: NpcBusEvents
+[2026-11-24 12:11:07.233] [Client] [debug] Running module: NpcAbilityEvent
+[2026-11-24 12:11:07.233] [Client] [debug] Running module: PakMount
+[2026-11-24 12:11:07.233] [Client] [debug] Running module: ModUnstageQueued
+[2026-11-24 12:11:07.256] [Client] [debug] Running module: ModCatalogHooks
+[2026-11-24 12:11:07.258] [Client] [debug] Running module: ModInstallSpaceCheck
+[2026-11-24 12:11:07.259] [Client] [debug] Running module: ModInstallErrors
+[2026-11-24 12:11:07.260] [ModSync] [info] CurseForge error diagnostics registered
+[2026-11-24 12:11:07.260] [Client] [debug] Running module: MapIcons
+[2026-11-24 12:11:07.261] [Client] [debug] Running module: InventoryStackLimits
+[2026-11-24 12:11:07.261] [Client] [debug] Running module: Interaction
+[2026-11-24 12:11:07.262] [Client] [debug] Running module: SpecialNotifications
+[2026-11-24 12:11:07.262] [SpecialNotifications] [info] special notifications off: 7 setting gates flipped
+[2026-11-24 12:11:07.262] [Client] [debug] Running module: HudGroups
+[2026-11-24 12:11:07.262] [Client] [debug] Running module: HousePoints
+[2026-11-24 12:11:07.262] [Client] [debug] Running module: Herbology
+[2026-11-24 12:11:07.263] [Client] [debug] Running module: FieldGuide
+[2026-11-24 12:11:07.264] [Client] [debug] Running module: Doors
+[2026-11-24 12:11:07.264] [Client] [debug] Running module: BeastMovement
+[2026-11-24 12:11:07.264] [Client] [debug] Running module: BeastCare
+[2026-11-24 12:11:07.265] [Client] [debug] Running module: BeastCapture
+[2026-11-24 12:11:07.268] [Client] [debug] Running module: Brewing
+[2026-11-24 12:11:07.269] [Client] [debug] Running module: DialoguePolicy
+[2026-11-24 12:11:07.269] [Dialogue] [info] line post hook: true
+[2026-11-24 12:11:07.269] [Client] [debug] Running module: GhostLook
+[2026-11-24 12:11:07.269] [Client] [debug] Running module: UE4_impl
+[2026-11-24 12:11:07.269] [Client] [debug] Running module: Playground
+[2026-11-24 12:11:07.269] [Client] [debug] Running module: Render_Device
+[2026-11-24 12:11:07.270] [Client] [debug] Running module: MenuTransition
+[2026-11-24 12:11:07.271] [Client] [debug] Running module: MenuPause
+[2026-11-24 12:11:07.272] [Client] [debug] Running module: MenuGatePages
+[2026-11-24 12:11:07.272] [Cli[2026-11-24 12:11:06.308] [Launcher] [info] Loading launcher settings from JSON config file...
+[2026-11-24 12:11:06.390] [Launcher] [info] Steam game: version 2153883, timestamp 0x6ADBD77D, 383492096 bytes: supported (this release supports 2153883)
+[2026-11-24 12:11:06.422] [Launcher] [info] Loading game D:/SteamLibrary/steamapps/common/Hogwarts Legacy\Phoenix/Binaries/Win64/HogwartsLegacy.exe
+[2026-11-24 12:11:06.422] [Launcher] [info] Loaded game (365.73 MB or 383492096)
+[2026-11-24 12:11:06.683] [Launcher] [info] Suppressing duplicate mapped-EXE TLS atexit registration
+[2026-11-24 12:11:06.798] [Launcher] [info] Process identity now reports the game executable to every loaded module
+[2026-11-24 12:11:06.798] [Launcher] [info] Mapped game command line: "D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Phoenix\Binaries\Win64\HogwartsLegacy.exe" -dx12 -SaveToUserDir -UserDir="Hogwarts Legacy\ArcaneMP" -SkipEpilepsy
+[2026-11-24 12:11:06.943] [Launcher] [info] Game TLS forwarding: 7 of the game's 9 callbacks get thread attach/detach (protector); 12 threads already running
+[2026-11-24 12:11:06.946] [Launcher] [warning] Removed r.ChosenFrameGenProvider=FStreamlineD3D12DXGISwapchainProvider from C:\Users\USER\AppData\Local\Hogwarts Legacy\ArcaneMP\Saved\Config\WindowsNoEditor\GameUserSettings.ini: frame generation crashes the ArcaneMP overlay
+ent] [debug] Running module: RegionEvent
+[2026-11-24 12:11:07.273] [Client] [debug] Running module: GameBus
+[2026-11-24 12:11:07.275] [Client] [debug] Running module: Engine_Crash
+[2026-11-24 12:11:07.275] [Client] [debug] Running module: Engine
+[2026-11-24 12:11:07.316] [Client] [info] Crash reporting initialized
+[2026-11-24 12:11:07.317] [CrashTrail] [info] The exception filter at HogwartsLegacy.exe+0x3A48580 had replaced crash reporting; it still runs first, and what it lets through now reaches crash reporting
+[2026-11-24 12:11:07.317] [Client] [info] Discord presence initialized
+[2026-11-24 12:11:07.344] [Client] [info] Networking engine initialized
+[2026-11-24 12:11:07.344] [Client] [debug] Voice client attached; devices open with the session
+[2026-11-24 12:11:07.344] [Client] [debug] Networking messages registered
+[2026-11-24 12:11:07.345] [Preferences] [info] Loaded 6 preference(s) from 'C:\Users\USER\AppData\Local\MafiaHub\ArcaneMP\preferences.json'
+[2026-11-24 12:11:07.345] [Preferences] [info] Voice: enabled=true mode=pushToTalk key=mouse5 volume=1.5 threshold=0.<id> release=100ms noiseSuppression=false device=''
+[2026-11-24 12:11:07.345] [Utils] [debug] [StateMachine] Requesting new state Initialize
+[2026-11-24 12:11:07.821] [Networking] [info] Networking messages registered!
+[2026-11-24 12:11:07.821] [Client] [info] Mod subsystems initialized
+[2026-11-24 12:11:07.821] [Client] [debug] Client has been initialized
+[2026-11-24 12:11:07.821] [DeepLink] [info] Deep link -> <redacted>
+[2026-11-24 12:11:07.824] [PakMount] [info] no copies of the files\paks containers in the game pak folders: 'D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Phoenix\Content\Paks\', 'C:\Users\USER\AppData\Local\Hogwarts Legacy\ArcaneMP\Saved\Paks\', 'D:\SteamLibrary\steamapps\common\Hogwarts Legacy\Engine\Content\Paks\'
+[2026-11-24 12:11:07.824] [PakMount] [info] appended 'C:\Users\USER\AppData\Local\ForgeLauncher\hogwartsmp\1.15.1\files\paks' to the engine pak scan (4 folders)
+[2026-11-24 12:11:27.785] [FreerideLoader] [info] render drain before teardown: flushed in 0 ms
+[2026-11-24 12:11:27.786] [IntroGate] [info] HasCompletedIntro exec swapped: UFunction 0x2bf29950 orig 0x1438cc320
+[2026-11-24 12:11:27.786] [FreerideLoader] [trace] LoadMap teardown: blocked=false remotes=0 proxies=0 forms=0 prop=false placed=0 plots=0 map '/Game/Levels/RootLevel'
+[2026-11-24 12:11:27.787] [FreerideLoader] [info] render drain before LoadMap: flushed in 0 ms
+[2026-11-24 12:11:28.343] [IntroGate] [info] HasCompletedIntro call #1 forced true (real=true)
+[2026-11-24 12:11:29.014] [Client] [debug] DX12 hooks installed (Present 0x7ffa3d4384c0, ExecuteCommandLists 0x7ff990a8f890)
+[2026-11-24 12:11:29.017] [Graphics] [info] r.SkinCache.SceneMemoryLimitInMB 128 -> 512
+[2026-11-24 12:11:29.017] [Graphics] [info] PhoenixSigMgr.LOD.TriangleBudget 2000000 -> 4000000
+[2026-11-24 12:11:29.017] [SpellCast] [info] ASpellTool::Start swapped into 45 vtables
+[2026-11-24 12:11:29.017] [RegionEvent] [trace] listening for EnteredRegion (fname 7811670)
+[2026-11-24 12:11:29.017] [GameBus] [trace] subscribed NearDeathKneelBegin (fname 7799867)
+[2026-11-24 12:11:29.017] [GameBus] [trace] subscribed PlayerDied (fname 6005589)
+[2026-11-24 12:11:29.017] [GameBus] [trace] subscribed NPCDead (fname 7876634)
+[2026-11-24 12:11:29.017] [GameBus] [trace] subscribed PlayerDied (fname 6005589, sync)
+[2026-11-24 12:11:29.984] [Integrations] [debug] [Discord] Current user updated <redacted>
+[2026-11-24 12:11:30.005] [Utils] [debug] [StateMachine] Requesting new state InMenu
+[2026-11-24 12:11:30.057] [Graphics] [info] D3D12 device 0x3add7d40
+[2026-11-24 12:11:30.057] [Client] [info] Rendering systems initialized
+[2026-11-24 12:11:30.058] [Graphics] [info] ImGui DX12 pipeline format 24, back buffer format 24
+[2026-11-24 12:11:30.095] [Graphics] [debug] Overlay scaled for a 1920x1080 back buffer behind a 1920x1080 window
+[2026-11-24 12:11:30.098] [Web] [debug] Initializing CEF: module 'C:\Users\USER\AppData\Local\ForgeLauncher\hogwartsmp\1.15.1', cache profile 'C:\Users\USER\AppData\Local\ForgeLauncher\hogwartsmp\1.15.1\cache\profiles\0', log 'C:\Users\USER\AppData\Local\ForgeLauncher\hogwartsmp\1.15.1\logs\cef.log'
+[2026-11-24 12:11:30.098] [Web] [debug] Process runs inside a job (limit flags 0x800); CEF helpers inherit it
+[2026-11-24 12:11:30.207] [Web] [debug] Using persistent CEF cache profile 'C:\Users\USER\AppData\Local\ForgeLauncher\hogwartsmp\1.15.1\cache\profiles\0'
+[2026-11-24 12:11:30.207] [Web] [info] CEF initialized successfully
+[2026-11-24 12:11:30.207] [Web] [info] Web manager initialized (1920x1080)
+[2026-11-24 12:11:30.207] [Web] [info] Serving fw://arcanemp/ from memory:arcanemp-menu
+[2026-11-24 12:11:30.219] [Web] [debug] Created view with id 1
+[2026-11-24 12:11:30.219] [MainMenu] [trace] menu view 1 created for fw://arcanemp/index.html
+[2026-11-24 12:11:30.219] [MainMenu] [info] front end entered
+[2026-11-24 12:11:30.219] [Web] [debug] Resource opened: fw://arcanemp/index.html (499586 bytes, text/html)
+[2026-11-24 12:11:30.305] [Web] [debug] Load start: fw://arcanemp/index.html
+[2026-11-24 12:11:30.313] [Utils] [debug] [StateMachine] Requesting new state SessionConnection
+[2026-11-24 12:11:30.361] [Web] [debug] Load end: fw://arcanemp/index.html (200)
+[2026-11-24 12:11:30.361] [MainMenu] [trace] menu document loaded
+[2026-11-24 12:11:30.361] [MainMenu] [trace] menu shown (document true, bridge false, state open false, handover true)
+[2026-11-24 12:11:30.376] [Web] [info] compositing suppressed (transition false, load screen hold 0, curtain false, world prepared false)
+[2026-11-24 12:11:30.378] [Client] [info] Account <redacted> (key at C:\Users\USER\AppData\Local\MafiaHub\ArcaneMP\account.key)
+[export] log cut here: the rest of this boot is a normal play session
