@@ -2,23 +2,29 @@
 #
 # ArcaneMP keeps its own settings (%LOCALAPPDATA%\Hogwarts Legacy\ArcaneMP\Saved), and some servers lock the
 # in-game settings menu, so changes made in the normal game never reach ArcaneMP on their own.
+# The normal game keeps its settings in %LOCALAPPDATA%\Hogwarts Legacy\Saved (Steam) or
+# %LOCALAPPDATA%\HogwartsLegacy\Saved (Epic, no space); the script looks in both and uses the one it finds.
 # This copies GameUserSettings.ini and SavedUserOptions.sav (the .sav carries its own copy of the same settings
 # text and wins over the .ini). Frame generation is switched off in both copies: ArcaneMP 1.15.1 crashes with it
 # (see frame-generation/ in this repository). Engine.ini is not touched, so the crowd fix stays.
-# Every run first backs up the ArcaneMP files to %LOCALAPPDATA%\Hogwarts Legacy\ArcaneMP-settings-backups\<time>\.
+# Every run first backs up the ArcaneMP files to ArcaneMP-settings-backups\<time>\ next to the ArcaneMP folder.
 #
 # Usage: copy-game-settings.ps1             copy the normal game's settings into ArcaneMP
 #        copy-game-settings.ps1 -Restore    put back the newest backup
-#        -SaveId <folder name>              only needed when the game has several SaveGames folders
-#        -Root <folder>                     another "Hogwarts Legacy" folder, used for testing
+#        -Source Steam|Epic                 only when both are installed and the newer one is not the one you want
+#        -SaveId <folder name>              only needed when the normal game has several SaveGames folders
+#        -LocalAppData <folder>             another %LOCALAPPDATA%, used for testing
 param(
     [switch]$Restore,
+    [ValidateSet('Auto', 'Steam', 'Epic')][string]$Source = 'Auto',
     [string]$SaveId,
-    [string]$Root = (Join-Path $env:LOCALAPPDATA 'Hogwarts Legacy')
+    [string]$LocalAppData = $env:LOCALAPPDATA
 )
 $ErrorActionPreference = 'Stop'
 # One byte = one character, so every file is rewritten byte for byte except the lines this script changes.
 $Latin1 = [Text.Encoding]::GetEncoding(28591)
+$IniRel = 'Saved\Config\WindowsNoEditor\GameUserSettings.ini'
+$GameFolders = [ordered]@{ Steam = 'Hogwarts Legacy'; Epic = 'HogwartsLegacy' }
 
 function Stop-Script([string]$Message) {
     Write-Host "$Message Nothing changed." -ForegroundColor Yellow
@@ -29,11 +35,24 @@ if (Get-Process -Name 'HogwartsLegacy', 'ArcaneMPLauncher' -ErrorAction Silently
     Stop-Script 'Close Hogwarts Legacy first (the game rewrites these files when it exits).'
 }
 
-$mainIni = Join-Path $Root 'Saved\Config\WindowsNoEditor\GameUserSettings.ini'
-$mainSaves = Join-Path $Root 'Saved\SaveGames'
-$mpIni = Join-Path $Root 'ArcaneMP\Saved\Config\WindowsNoEditor\GameUserSettings.ini'
-$mpSaves = Join-Path $Root 'ArcaneMP\Saved\SaveGames'
-$backupRoot = Join-Path $Root 'ArcaneMP-settings-backups'
+# The folder among $Dirs whose settings file was written last, or $null when none has one.
+function Select-Newest([string[]]$Dirs) {
+    $hits = @($Dirs | Where-Object { Test-Path -LiteralPath (Join-Path $_ $IniRel) } |
+        Sort-Object { (Get-Item -LiteralPath (Join-Path $_ $IniRel)).LastWriteTime } -Descending)
+    if ($hits.Count -eq 0) { return $null }
+    return $hits[0]
+}
+
+# Save folders (one per game account) under SaveGames that hold SavedUserOptions.sav.
+function Get-SaveFolders([string]$Dir) {
+    return @(Get-ChildItem -LiteralPath (Join-Path $Dir 'Saved\SaveGames') -Directory -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SavedUserOptions.sav') } | ForEach-Object { $_.Name })
+}
+
+$mpDir = Select-Newest @($GameFolders.Values | ForEach-Object { Join-Path $LocalAppData "$_\ArcaneMP" })
+if (-not $mpDir) { Stop-Script 'No ArcaneMP settings found. Start ArcaneMP once, then run this again.' }
+$mpIni = Join-Path $mpDir $IniRel
+$backupRoot = Join-Path (Split-Path -Parent $mpDir) 'ArcaneMP-settings-backups'
 
 # SavedUserOptions.sav is an Unreal save file. The settings live in one property, SettingsData: an array of bytes
 # holding the same text as GameUserSettings.ini. Layout: name, type "ArrayProperty", 8-byte size (= count + 4),
@@ -90,24 +109,22 @@ function Clear-ReadOnly([string]$Path) {
     }
 }
 
-function Save-Backup([string]$Name, [string]$Id) {
+function Save-Backup([string]$Name, [string]$SaveFolder) {
     $dir = Join-Path $backupRoot $Name
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
     Copy-Item -LiteralPath $mpIni -Destination (Join-Path $dir 'GameUserSettings.ini')
-    $sav = Join-Path $mpSaves "$Id\SavedUserOptions.sav"
+    $sav = Join-Path $mpDir "Saved\SaveGames\$SaveFolder\SavedUserOptions.sav"
     if (Test-Path -LiteralPath $sav) { Copy-Item -LiteralPath $sav -Destination (Join-Path $dir 'SavedUserOptions.sav') }
-    [IO.File]::WriteAllText((Join-Path $dir 'saveid.txt'), $Id)
+    [IO.File]::WriteAllText((Join-Path $dir 'saveid.txt'), $SaveFolder)
     return $dir
 }
-
-if (-not (Test-Path -LiteralPath $mpIni)) { Stop-Script 'No ArcaneMP settings found. Start ArcaneMP once, then run this again.' }
 
 if ($Restore) {
     $last = Get-ChildItem -LiteralPath $backupRoot -Directory -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -notlike '*-before-restore' } | Sort-Object Name | Select-Object -Last 1
     if (-not $last) { Stop-Script "No backup found in $backupRoot." }
     $id = ([IO.File]::ReadAllText((Join-Path $last.FullName 'saveid.txt'))).Trim()
-    $mpSav = Join-Path $mpSaves "$id\SavedUserOptions.sav"
+    $mpSav = Join-Path $mpDir "Saved\SaveGames\$id\SavedUserOptions.sav"
     $safe = Save-Backup ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-before-restore') $id
     Clear-ReadOnly $mpIni
     Clear-ReadOnly $mpSav
@@ -124,20 +141,41 @@ if ($Restore) {
     exit 0
 }
 
-if (-not (Test-Path -LiteralPath $mainIni)) { Stop-Script 'No settings found for the normal game. Start Hogwarts Legacy once without ArcaneMP.' }
+# The normal game: Steam and Epic name the folder differently.
+$candidates = @($GameFolders.Keys | Where-Object { $Source -eq 'Auto' -or $Source -eq $_ } | ForEach-Object {
+    $dir = Join-Path $LocalAppData $GameFolders[$_]
+    if (Test-Path -LiteralPath (Join-Path $dir $IniRel)) { $dir }
+})
+$mainDir = Select-Newest $candidates
+if (-not $mainDir) {
+    $where = ($GameFolders.Keys | Where-Object { $Source -eq 'Auto' -or $Source -eq $_ } | ForEach-Object { $GameFolders[$_] }) -join ' or '
+    Stop-Script "No settings found for the normal game in $where. Start Hogwarts Legacy once without ArcaneMP."
+}
+$store = ($GameFolders.Keys | Where-Object { (Join-Path $LocalAppData $GameFolders[$_]) -eq $mainDir })
+if ($candidates.Count -gt 1) {
+    Write-Host "Both Steam and Epic settings found; using $store, the one changed last. Choose with -Source Steam or -Source Epic."
+}
+$mainIni = Join-Path $mainDir $IniRel
 
 if ($SaveId) {
     $id = $SaveId
 } else {
-    $ids = @(Get-ChildItem -LiteralPath $mainSaves -Directory -ErrorAction SilentlyContinue |
-        Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SavedUserOptions.sav') } | ForEach-Object { $_.Name })
-    if ($ids.Count -eq 0) { Stop-Script "No SavedUserOptions.sav in $mainSaves. Start the normal game once and change a setting." }
+    $ids = @(Get-SaveFolders $mainDir)
+    if ($ids.Count -eq 0) { Stop-Script "No SavedUserOptions.sav in $mainDir\Saved\SaveGames. Start the normal game once and change a setting." }
     if ($ids.Count -gt 1) { Stop-Script ('Several save folders found (' + ($ids -join ', ') + '). Run again with -SaveId <one of them>.') }
     $id = $ids[0]
 }
-$mainSav = Join-Path $mainSaves "$id\SavedUserOptions.sav"
-$mpSav = Join-Path $mpSaves "$id\SavedUserOptions.sav"
-if (-not (Test-Path -LiteralPath $mainSav)) { Stop-Script "No SavedUserOptions.sav in $mainSaves\$id." }
+$mainSav = Join-Path $mainDir "Saved\SaveGames\$id\SavedUserOptions.sav"
+if (-not (Test-Path -LiteralPath $mainSav)) { Stop-Script "No SavedUserOptions.sav in $mainDir\Saved\SaveGames\$id." }
+
+# ArcaneMP's save folder can have another name than the normal game's (an Epic account id against a Steam one).
+# Use the one ArcaneMP already has; with none yet, use the normal game's name.
+$mpIds = @(Get-SaveFolders $mpDir)
+if ($mpIds.Count -eq 0) { $mpId = $id }
+elseif ($mpIds.Count -eq 1) { $mpId = $mpIds[0] }
+elseif ($mpIds -contains $id) { $mpId = $id }
+else { Stop-Script ('ArcaneMP has several save folders (' + ($mpIds -join ', ') + ') and none matches ' + $id + '.') }
+$mpSav = Join-Path $mpDir "Saved\SaveGames\$mpId\SavedUserOptions.sav"
 
 # Read and check everything before writing anything.
 try { $parts = Read-SettingsSav $mainSav } catch { Stop-Script "The normal game's SavedUserOptions.sav has a layout this script does not know ($($_.Exception.Message))." }
@@ -145,7 +183,7 @@ $newSavText = Set-FrameGenerationOff $parts.Text
 $newIni = Set-FrameGenerationOff ($Latin1.GetString([IO.File]::ReadAllBytes($mainIni)))
 if ((Test-FrameGenerationOn $newIni) -or (Test-FrameGenerationOn $newSavText)) { Stop-Script 'Could not switch frame generation off in the copy.' }
 
-$bk = Save-Backup (Get-Date -Format 'yyyyMMdd-HHmmss') $id
+$bk = Save-Backup (Get-Date -Format 'yyyyMMdd-HHmmss') $mpId
 Clear-ReadOnly $mpIni
 Clear-ReadOnly $mpSav
 [IO.File]::WriteAllBytes($mpIni, $Latin1.GetBytes($newIni))
@@ -160,7 +198,7 @@ if ($readIni -ne $newIni -or $readSav.Text -ne $newSavText -or (Test-FrameGenera
     exit 1
 }
 
-Write-Host 'Copied the normal game settings into ArcaneMP (frame generation off).' -ForegroundColor Green
+Write-Host "Copied the normal game settings ($store, $mainDir) into ArcaneMP (frame generation off)." -ForegroundColor Green
 Write-Host "Backup of the previous ArcaneMP settings: $bk"
 Write-Host 'Settings now in ArcaneMP:'
 $keys = 'ResolutionSizeX', 'ResolutionSizeY', 'FullscreenMode', 'UpscaleMode', 'FrameRateLimit', 'bUseVSync',

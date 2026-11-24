@@ -17,7 +17,8 @@ O ArcaneMP tem configuracoes proprias, separadas do jogo normal, e alguns
 servidores travam o menu. Para levar as configuracoes do jogo normal:
 1. Abra o Hogwarts Legacy SEM o ArcaneMP, ajuste graficos, camera, som e HUD,
    e feche o jogo.
-2. De dois cliques em copy-settings.bat.
+2. De dois cliques em copy-settings.bat (funciona com a versao Steam e Epic;
+   ele acha a pasta sozinho).
 3. Entre no servidor normalmente.
 Para desfazer: feche o jogo e de dois cliques em restore-settings.bat.
 A geracao de quadros (frame generation) fica desligada na copia, porque trava
@@ -38,7 +39,8 @@ ArcaneMP has its own settings, separate from the normal game, and some servers
 lock the menu. To bring over the normal game's settings:
 1. Start Hogwarts Legacy WITHOUT ArcaneMP, set graphics, camera, sound and HUD,
    and quit.
-2. Double-click copy-settings.bat.
+2. Double-click copy-settings.bat (works with the Steam and Epic versions;
+   it finds the folder by itself).
 3. Join the server as usual.
 To undo: close the game and double-click restore-settings.bat.
 Frame generation is switched off in the copy, because it crashes ArcaneMP.

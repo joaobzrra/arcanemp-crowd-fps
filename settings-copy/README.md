@@ -4,15 +4,19 @@ ArcaneMP keeps its own settings, separate from the normal game:
 
 | | Folder under `%LOCALAPPDATA%\Hogwarts Legacy\` |
 |---|---|
-| Normal game | `Saved\` |
+| Normal game, Steam | `Saved\` |
 | ArcaneMP (Forge launcher and ArcaneMP launcher) | `ArcaneMP\Saved\` |
+
+The Epic Games version of the normal game uses `%LOCALAPPDATA%\HogwartsLegacy\Saved\` instead (no space). The script
+looks in both and says which one it copied. If both exist it takes the one changed last; run
+`tools\copy-game-settings.ps1 -Source Steam` (or `Epic`) to choose.
 
 Some servers lock the in-game settings menu and say they use your Hogwarts Legacy settings. They use the
 ArcaneMP copy, so a change made in the normal game does not reach the server.
 
 ## Use
 
-Both files are in `arcanemp-crowd-fix.zip` on Releases (v1.1 and later), next to the crowd fix.
+Both files are in `arcanemp-crowd-fix.zip` on Releases (v1.1 and later; Epic Games installs from v1.2), next to the crowd fix.
 
 1. Start Hogwarts Legacy **without** ArcaneMP, set graphics, camera, sound and HUD the way you want, quit.
 2. Double-click `copy-settings.bat`.
@@ -23,7 +27,8 @@ Undo: close the game, double-click `restore-settings.bat`. It puts back the sett
 ## What it does
 
 - Copies `Saved\Config\WindowsNoEditor\GameUserSettings.ini` and `Saved\SaveGames\<id>\SavedUserOptions.sav`
-  into the same places under `ArcaneMP\`. The `.sav` holds a second copy of the same settings, and the game
+  into the same places under `ArcaneMP\`. The `<id>` folder can be named differently there (an Epic account id
+  against a Steam one): the script uses the one ArcaneMP already has. The `.sav` holds a second copy of the same settings, and the game
   reads it over the `.ini`, so both are copied.
 - Switches frame generation off in both copies (DLSS, FSR and XeSS frame generation crash ArcaneMP 1.15.1, see
   [../frame-generation/](../frame-generation/)). The normal game keeps its own frame generation setting.
