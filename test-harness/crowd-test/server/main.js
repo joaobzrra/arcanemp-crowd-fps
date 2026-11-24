@@ -22,7 +22,7 @@ let SPREAD = 1;            // console: crowdspread <x>  (ring radius multiplier 
 const MAX_CROWD = 250;
 
 const SETTLE_S = 60;
-const PHASE_S = 120;
+let PHASE_S = 120;         // command: crowdphase <seconds>  (length of each phase of the next run)
 const DEFAULT_SCHEDULE = [0, 25, 50, 100, 150, 200, 0];
 
 // Open ground for the test: the Quidditch pitch POI (HW_QuidditchPitch, from Foundations'
@@ -235,12 +235,14 @@ function startHeavy(playerlike) {
 // room-sized disc doing room things, the remainder walking 30-100 m out; the server's own streaming decides
 // how many of those reach the client.
 const SCENE_NEAR = 65;
-const SCENE_NEAR_CM = 1000;
+let SCENE_NEAR_CM = 1000;  // command: crowdnear <cm>
+let PLACE = null;          // command: crowdplace <x> <y> <z>  (run location; null = the pitch)
+let TELEPORT = true;       // command: crowdtp <on|off>
 const SCENE_FAR_MIN_CM = 3000;
 const SCENE_FAR_MAX_CM = 10000;
 
 function spawnScene(player, count, look, useLook) {
-  const origin = player.position;
+  const origin = (!TELEPORT && PLACE) ? PLACE : player.position;
   const nNear = Math.min(SCENE_NEAR, count);
   let ok = 0, failed = 0, firstError = "";
   const roles = { idle: 0, sit: 0, pace: 0, cast: 0, far: 0 };
@@ -440,8 +442,15 @@ function startRun(player, mode, schedule) {
   runSchedule = schedule && schedule.length ? schedule : DEFAULT_SCHEDULE;
   autoRunning = true;
   phaseLabel = "teleport";
-  const requestId = player.teleport(PITCH.x, PITCH.y, PITCH.z, { yaw: 0, snapToGround: true });
-  log(`run requested (${runMode}); teleport to pitch id ${requestId}`);
+  if (!TELEPORT) {
+    // The tester placed the character by hand: leave it where it is and start the schedule.
+    log(`run requested (${runMode}); no teleport, player stays at ${JSON.stringify(player.position)}`);
+    runPhases(player);
+    return;
+  }
+  const dest = PLACE || PITCH;
+  const requestId = player.teleport(dest.x, dest.y, dest.z, { yaw: 0, snapToGround: true });
+  log(`run requested (${runMode}); teleport to ${PLACE ? `place ${dest.x},${dest.y},${dest.z}` : "pitch"} id ${requestId}`);
   if (requestId > 0) pendingTeleports.set(requestId, player.id);
   setTimeout(() => {
     if (phaseLabel === "teleport") { log("teleport completion not seen in 30s; starting anyway"); runPhases(player); }
@@ -498,6 +507,36 @@ function handleCommand(command, args) {
     const v = Number(args && args[0]);
     if (v > 0 && v <= 10) SPREAD = v;
     log("spread now " + SPREAD);
+    return;
+  }
+  if (cmd === "crowdplace") {
+    // crowdplace <x> <y> <z>: the next runs teleport there instead of the pitch; "crowdplace pitch" resets.
+    const v = (args || []).slice(0, 3).map(Number);
+    PLACE = v.length === 3 && v.every(Number.isFinite) ? { x: v[0], y: v[1], z: v[2] } : null;
+    log("place now " + (PLACE ? `${PLACE.x},${PLACE.y},${PLACE.z}` : "pitch"));
+    return;
+  }
+  if (cmd === "crowdtp") {
+    // crowdtp off: runs do not teleport the player; with a place set, "scene" crowds are centred on the place.
+    TELEPORT = String((args && args[0]) || "on").toLowerCase() !== "off";
+    log("teleport on run: " + (TELEPORT ? "on" : "off"));
+    return;
+  }
+  if (cmd === "crowdwhere") {
+    for (const p of PlayerManager.getAll()) log(`where: ${p.nickname} at ${JSON.stringify(p.position)}`);
+    return;
+  }
+  if (cmd === "crowdnear") {
+    // crowdnear <cm>: radius of the "scene" mode's near cluster (room size) for the next spawn.
+    const v = Number(args && args[0]);
+    if (v >= 200 && v <= 5000) SCENE_NEAR_CM = v;
+    log("scene near radius now " + SCENE_NEAR_CM + " cm");
+    return;
+  }
+  if (cmd === "crowdphase") {
+    const v = Number(args && args[0]);
+    if (v >= 10 && v <= 14400) PHASE_S = v;
+    log("phase length now " + PHASE_S + " s");
     return;
   }
   if (cmd !== "crowdrun") return;
