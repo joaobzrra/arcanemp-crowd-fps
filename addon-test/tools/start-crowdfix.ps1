@@ -8,29 +8,38 @@ $dll = Join-Path $root 'ue4ss\UE4SS.dll'
 $settings = Join-Path $root 'ue4ss\Mods\CrowdFix\settings.txt'
 if (-not (Test-Path -LiteralPath $dll)) { Write-Host "UE4SS.dll not found at $dll" -ForegroundColor Red; exit 1 }
 
-# Preset = distance (cm) beyond which other players animate with fewer updates.
+# A preset sets two distances (cm) in settings.txt:
+#   Cm    = distance:      beyond it other players animate with fewer updates (URO)
+#   Sleep = sleepdistance: beyond it other players are asleep on this PC (not drawn, not animated); 0 = nobody sleeps
 $presets = [ordered]@{
-    '1' = @{ Name = 'Ultra Performance'; Cm = 1000; Note = 'weak PCs; players beyond 10 m move less smoothly' }
-    '2' = @{ Name = 'Performance';       Cm = 1500; Note = '' }
-    '3' = @{ Name = 'Balanced';          Cm = 2000; Note = '' }
-    '4' = @{ Name = 'Quality';           Cm = 2500; Note = 'tested default; no visible difference' }
+    '1' = @{ Name = 'Ultra Performance (100 m)'; Cm = 1000; Sleep = 10000; Note = 'players beyond 100 m are not drawn; beyond 10 m they move less smoothly' }
+    '2' = @{ Name = 'Performance (200 m)';       Cm = 1500; Sleep = 20000; Note = 'players beyond 200 m are not drawn' }
+    '3' = @{ Name = 'Balanced';                  Cm = 2000; Sleep = 0;     Note = 'everybody stays visible' }
+    '4' = @{ Name = 'Quality';                   Cm = 2500; Sleep = 0;     Note = 'everybody stays visible; tested default' }
 }
-$text = if (Test-Path -LiteralPath $settings) { [IO.File]::ReadAllText($settings) } else { "enabled=1`r`ndistance=2500`r`ninterpolate=1`r`nanimrate=2`r`n" }
+$text = if (Test-Path -LiteralPath $settings) { [IO.File]::ReadAllText($settings) } else { "enabled=1`r`ndistance=2500`r`ninterpolate=1`r`nanimrate=2`r`nfardistance=5000`r`nfarinterval=0.2`r`nsleepdistance=0`r`n" }
 $current = if ($text -match '(?m)^\s*distance\s*=\s*(\d+)') { [int]$matches[1] } else { 2500 }
 $default = ($presets.Keys | Where-Object { $presets[$_].Cm -eq $current } | Select-Object -First 1); if (-not $default) { $default = '4' }
 if (-not $Preset) {
     Write-Host 'CrowdFix preset / Modo:'
     foreach ($k in $presets.Keys) {
         $p = $presets[$k]; $mark = if ($k -eq $default) { ' (current)' } else { '' }
-        Write-Host ("  {0}. {1,-18} {2,2} m{3}  {4}" -f $k, $p.Name, ($p.Cm / 100), $mark, $p.Note)
+        Write-Host ("  {0}. {1,-26}{2}  {3}" -f $k, $p.Name, $mark, $p.Note)
     }
     $answer = Read-Host "Choose 1-4 (Enter = $default)"
     $Preset = if ($answer -and $presets.Contains($answer.Trim())) { $answer.Trim() } else { $default }
 }
 $chosen = $presets[$Preset]
-$text = if ($text -match '(?m)^\s*distance\s*=') { $text -replace '(?m)^(\s*distance\s*=\s*)\d+', "`${1}$($chosen.Cm)" } else { $text.TrimEnd() + "`r`ndistance=$($chosen.Cm)`r`n" }
+# Replaces the line `name=<number>` or adds it when the file has none (a settings.txt from an older version).
+function Set-Line([string]$body, [string]$name, [int]$value) {
+    if ($body -match "(?m)^\s*$name\s*=") { return $body -replace "(?m)^(\s*$name\s*=\s*)\d+", "`${1}$value" }
+    return $body.TrimEnd() + "`r`n$name=$value`r`n"
+}
+$text = Set-Line $text 'distance' $chosen.Cm
+$text = Set-Line $text 'sleepdistance' $chosen.Sleep
 [IO.File]::WriteAllText($settings, $text, (New-Object Text.UTF8Encoding($false)))
-Write-Host ("Preset: {0} ({1} m)" -f $chosen.Name, ($chosen.Cm / 100)) -ForegroundColor Cyan
+$sleepNote = if ($chosen.Sleep -gt 0) { "players beyond $($chosen.Sleep / 100) m asleep" } else { 'nobody asleep' }
+Write-Host ("Preset: {0} - fewer updates beyond {1} m, {2}" -f $chosen.Name, ($chosen.Cm / 100), $sleepNote) -ForegroundColor Cyan
 
 Add-Type -Namespace CF -Name Native -MemberDefinition @'
 [DllImport("kernel32.dll", SetLastError=true)] public static extern System.IntPtr OpenProcess(uint access, bool inherit, int pid);

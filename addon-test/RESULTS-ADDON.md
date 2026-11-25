@@ -300,9 +300,89 @@ switched off. Same session as Test 12, 30-38 players, 15 s settle + 40 s measure
 - Limits: one measurement per state, on one PC, with at most 38 players loaded; not yet repeated in a full
   server. The visual effect on far players was accepted by the tester without a line of sight to them.
 
+## Test 14: CrowdFix v3, sleep beyond a distance (local and live, 2026-11-24 19:44-21:02)
+Outside a class the client loads the whole server: on a roof with 2 players on screen, 77 of 82 loaded avatars
+were farther than 100 m. New setting `sleepdistance` (cm, 0 = off). A player beyond it is put to sleep on this PC
+only: every skeletal mesh of the avatar, of what it holds (wand) and of its mount is hidden with
+`SetHiddenInGame(true, false)`, and the ticks of those meshes, of the movement, ability, managed-character and
+facial components and of the actor are switched off. The mod restores only what it changed, when the player comes
+inside 90% of the distance, when the mod is switched off, or when the player despawns. A sleeping avatar's position
+still follows the real player, so waking by distance works. Presets in the loader: Ultra Performance (sleep beyond
+100 m, URO beyond 10 m), Performance (200 m, 15 m), Balanced and Quality (nobody sleeps).
+
+Also changed in v3:
+- Timer: `LoopInGameThreadWithDelay` instead of `LoopAsync` (kept as a fallback). A game crash with two copies of
+  the script loaded in one game was traced to this. Read in the UE4SS v4.0.0 source (`LuaMod.cpp`): `LoopAsync`
+  callbacks run on the mod's own thread, on a Lua thread of the same Lua state the mod's other callbacks use.
+  That this caused the crash is inferred, not proven.
+- The map of meshes per player is built a little per step (2 ms budget per 250 ms step, one class per step).
+  The earlier build walked every skeletal mesh in one callback: up to 31 ms measured live.
+- Hiding per mesh: `SetActorHiddenInGame(true)` succeeds on these avatars but `bHidden` reads false before and
+  after; per mesh, `bHiddenInGame` and `IsVisible()` read back.
+- After a player leaves, the client keeps the avatar as an empty shell until the next garbage collection (about
+  30 s): parked at the world origin, actor tick off, body mesh still valid but no longer owned by the avatar
+  (`probe/crowddiag-scripts/shell_probe.lua`). v3 does not count or handle shells. Player counts in the status
+  lines of earlier tests, and their ">500 m" group, included shells.
+- Offline test against a fake engine: `tests/crowdfix_mock_test.lua`, 25 checks, both timer modes.
+
+Local server, 100 scripted players at 1-104 m, one copy of the mod, read back from outside the mod
+(`probe/crowddiag-scripts/sleep_readback_ro.lua`, driver `test-harness/scripts/local-sleep-states.ps1`):
+
+| State | Asleep (mod) | Read-back | FPS (5 s samples, cap 75) |
+|---|---|---|---|
+| Off | 0 | `hidden=0 actorTickOff=0 meshesTicking=381` | 45-55 |
+| Sleep beyond 50 m | 25 | `hidden=26 ... hidden inside 90%=0, visible beyond=0`, `meshesTicking=290` | 62-66 |
+| Sleep beyond 10 m (run before the shell change) | 75 | `hidden=75 ... hidden inside 90%=0, visible beyond=0`, `meshesTicking=92` | 71-75 |
+| Off | 0 | `hidden=0 actorTickOff=0 meshesTicking=381`, `intervals: 0.000s=381` | 46-58 |
+
+- Slowest mod step 3-8 ms in every state, 10 ms while players were recreated (440 and 590 recreates in two
+  runs). No error line. Screenshots with the 10 m limit: no leftover shadow, wand or frozen body.
+
+Live (CHRONIX), roof of a house, 65-88 players loaded, 1-3 on screen, 15 s settle + 40 s measure, frame cap 75
+(driver `test-harness/scripts/live-crowdfix-v3-ab.ps1`). CPU ms per frame:
+
+| State | FPS | Game | Render | RHI | Read-back |
+|---|---|---|---|---|---|
+| Off | 41.1 | 23.30 | 20.44 | 16.98 | |
+| Performance (sleep beyond 200 m) | 63.1 | 15.22 | 9.79 | 9.81 | 21 asleep, 63 slowed |
+| Off | 47.7 | 19.83 | 18.03 | 14.63 | |
+| Ultra Performance (sleep beyond 100 m) | 74.0 | 12.44 | 8.18 | 8.92 | 64 asleep |
+| Off | 44.2 | 21.23 | 18.50 | 15.33 | |
+
+- Against the baselines on both sides: Performance +18.7 FPS (+42%), game -6.3 ms, render -9.4 ms, RHI -6.0 ms.
+  Ultra Performance +28 FPS (+61%, at the cap), game -8.1 ms, render -10.1 ms, RHI -6.1 ms.
+- Slowest mod step 3-7 ms. No error line. The client built 15-23 player bodies per step in every state, on or
+  off: sleeping does not make it rebuild players.
+- After the run: `hidden=0`, `intervals: 0.000s=317`, body ticking on all 66 players that had a body.
+- Visual: the tester noticed no difference during either preset, and saw one far player (estimated 50-100 m)
+  running with no animation. Cause not determined: the 0.2 s interval beyond 50 m, or a sleeping player whose
+  clothes the client re-applied (new meshes of a sleeping player stay visible until the next map, up to about 13 s).
+- Limits: one run per state on one PC; a sleeping player on a broom was only tested offline; the loader (`.bat`)
+  was not yet run with this build when this was written.
+
+## Test 15: a crowd close by and on screen (live, 2026-11-24 21:11-21:17)
+A dinner: 92-98 players loaded, 55-66 on screen, all within 30 m. 12 s settle + 40 s measure
+(driver `test-harness/scripts/live-settings-ab.ps1`). CPU ms per frame:
+
+| State | FPS | Game | Render | RHI | Read-back |
+|---|---|---|---|---|---|
+| Off | 29.7 | 23.99 | 26.62 | 23.31 | |
+| 0.05 s mesh tick interval beyond 3 m | 30.4 | 25.11 | 27.49 | 23.14 | 87 players slowed |
+| Off | 29.0 | 23.96 | 27.24 | 23.88 | |
+| No shadows beyond 5 m (`SetCastShadow(false)`) | 31.3 | 22.58 | 24.06 | 20.51 | 75 players |
+| Off | 31.6 | 23.25 | 25.60 | 21.70 | |
+
+- The interval gave no gain. It was applied and stayed applied: read back every 8 s for 40 s, 404 of 434 ticking
+  avatar meshes at 0.050 s (`probe/crowddiag-scripts/interval_readback_ro.lua`), FPS 30-34. Not explained.
+- No shadows: about -2.4 ms render, -2.3 ms RHI, +1 FPS, inside the drift between the baselines.
+- No thread is saturated in this state (game 69-76%, render 75-86%, GPU 32-38%).
+- Conclusion: the add-on's distance steps do not reach a crowd that stands this close. No player-side setting
+  was found for it; it needs work inside the client.
+
 ## Result
 Recipe: `r.SkeletalMeshLODBias=2` (Engine.ini) + URO on the remote body mesh beyond 25 m +
-`a.URO.ForceInterpolation 1` + `a.URO.ForceAnimRate 2` + a 0.2 s mesh tick interval for players beyond 50 m.
+`a.URO.ForceInterpolation 1` + `a.URO.ForceAnimRate 2` + a 0.2 s mesh tick interval for players beyond 50 m +
+sleep (hidden, no ticks) for players beyond 100 m or 200 m (Test 14).
 Nearby players are untouched.
 For the mod team: the same can be done inside the client with no add-on. The larger fix is on the same line:
 remote players that are far away or not visible should not be animated every frame (Tests 11-13), and players
@@ -315,6 +395,8 @@ hundreds of metres away are currently fully built.
   server (Test 6); single runs per setting, phase noise about +-3 FPS.
 - The 56.8 -> 61.1 "recipe" gain (Test 5) is a single run near the noise level and did not repeat in rooms.
 - Not an official ArcaneMP feature; it needs UE4SS loaded after the menu (late injection).
+- Only one copy of the mod may run in a game: loading a second copy of the script into a running game crashed it.
+- A crowd close by and on screen is not helped (Test 15).
 - "A real player costs three times a scripted one" (Test 10) is not established: the scripted figure came from
   a mixed cohort and the live figure from two different places. Test 12 measures the live per-player cost directly.
 
@@ -333,5 +415,11 @@ hundreds of metres away are currently fully built.
   frame counter every 5 s, which the live drivers read).
 - `../test-harness/scripts/live-ablate.ps1`: the step driver of Test 12 (no local server needed; FPS from the
   frame counter the scan mod prints). `../test-harness/scripts/live-crowdfix-ab.ps1`: the on/off run of Test 13.
+- `tests/crowdfix_mock_test.lua`: offline test of the mod against a fake engine (Lua 5.4):
+  `lua tests/crowdfix_mock_test.lua CrowdFix/Scripts/main.lua <empty scratch folder> [async]`.
+- `../test-harness/scripts/local-sleep-states.ps1`, `live-crowdfix-v3-ab.ps1`: the local state check and the live
+  preset run of Test 14. `live-settings-ab.ps1`: the off / setting / off run of Test 15.
+- `probe/crowddiag-scripts/sleep_readback_ro.lua`, `shell_probe.lua`, `interval_readback_ro.lua`: the read-only
+  read-backs of Tests 14-15.
 - Not in the repository: the trace reader used for Test 11's sampling numbers.
 - Release asset `arcanemp-crowdfix-addon-test.zip` = these files + UE4SS v4.0.0 (MIT licence).

@@ -310,15 +310,18 @@ local function run(line)
     else log("unknown command: " .. line) end
 end
 
-LoopAsync(1000, function()
+-- The timer fires on the game thread. LoopAsync runs its callback on UE4SS's async thread, which shares this Lua
+-- state with the game-thread callbacks; two of them running at the same moment crashed the game on 2026-11-24.
+local function everyMs(ms, fn)
+    if LoopInGameThreadWithDelay then LoopInGameThreadWithDelay(ms, fn)
+    else LoopAsync(ms, function() ExecuteInGameThread(fn); return false end) end
+end
+everyMs(1000, function()
     local f = io.open(DIR .. "cmd.txt", "r")
     if f then
         local lines = {}; for l in f:lines() do l = l:gsub("^%s+", ""):gsub("%s+$", ""); if l ~= "" then table.insert(lines, l) end end
         f:close(); os.remove(DIR .. "cmd.txt")
-        ExecuteInGameThread(function()
-            for _, l in ipairs(lines) do local ok, e = pcall(run, l); if not ok then log("error in '" .. l .. "': " .. tostring(e)) end end
-        end)
+        for _, l in ipairs(lines) do local ok, e = pcall(run, l); if not ok then log("error in '" .. l .. "': " .. tostring(e)) end end
     end
-    return false
 end)
-log("loaded")
+log("loaded (" .. (LoopInGameThreadWithDelay and "game-thread timer" or "async timer") .. ")")

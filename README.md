@@ -39,6 +39,9 @@ frame generation switched off, and can undo it. It ships in the same `arcanemp-c
 The config fix above only helps the render thread. A separate test add-on lowers the game-thread cost of
 distant remote players (URO on their body mesh beyond 25 m): with the LOD fix, 100 characters spread
 over 15-50 m went from 56.8 to a stable 61 FPS with no visible stutter.
+Its presets can also put far players to sleep on your PC (not drawn, not animated beyond 100 m or 200 m): on a
+live server with 65-88 players loaded, almost all farther than 100 m, 44 -> 63 FPS (200 m) and 46 -> 74 FPS
+(100 m). A crowd standing close to you is not helped.
 Test build, not approved by ArcaneMP yet. All tests, numbers and visual verdicts:
 [addon-test/RESULTS-ADDON.md](addon-test/RESULTS-ADDON.md).
 
