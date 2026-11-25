@@ -36,14 +36,38 @@ frame generation switched off, and can undo it. It ships in the same `arcanemp-c
 
 ## Add-on test (CrowdFix, UE4SS)
 
-The config fix above only helps the render thread. A separate test add-on lowers the game-thread cost of
-distant remote players (URO on their body mesh beyond 25 m): with the LOD fix, 100 characters spread
-over 15-50 m went from 56.8 to a stable 61 FPS with no visible stutter.
-Its presets can also put far players to sleep on your PC (not drawn, not animated beyond 100 m or 200 m): on a
-live server with 65-88 players loaded, almost all farther than 100 m, 44 -> 63 FPS (200 m) and 46 -> 74 FPS
-(100 m). A crowd standing close to you is not helped.
-Test build, not approved by ArcaneMP yet. All tests, numbers and visual verdicts:
-[addon-test/RESULTS-ADDON.md](addon-test/RESULTS-ADDON.md).
+**Unstable test build, not approved by ArcaneMP yet. Use at your own risk.**
+
+The config fix above only helps the render thread. Outside a class the game also loads every player on the
+server, including those hundreds of metres away. A separate add-on lowers the cost of those far players on
+your PC only: nothing is sent to the server and nobody else sees a difference.
+
+1. Download `arcanemp-crowdfix-addon-v3-unstable.zip` from the release
+   [CrowdFix add-on v3 (unstable)](https://github.com/joaobzrra/arcanemp-crowd-fps/releases/tag/addon-v3-unstable)
+   and unzip it anywhere.
+2. Double-click `start-crowdfix.bat` (before or after starting the game) and pick a preset.
+3. Start the game as usual. The window prints "CrowdFix loaded" about 30 s after the game opens.
+
+To stop: close the game. Nothing stays installed. Run the `.bat` again while the game is open to switch preset.
+
+| Preset | Players that sleep (not drawn, not animated) | Fewer animation updates beyond |
+|---|---|---|
+| 1 Ultra Performance | farther than 100 m | 10 m |
+| 2 Performance | farther than 200 m | 15 m |
+| 3 Balanced | nobody | 20 m |
+| 4 Quality | nobody | 25 m |
+
+In every preset, players farther than 50 m animate 5 times a second. Sleeping players wake up by themselves
+when they come closer.
+
+| Live server, 65-88 players loaded, almost all farther than 100 m | FPS | Change |
+|---|---|---|
+| Add-on off | 44-46 | |
+| Performance (200 m) | 63 | +42% |
+| Ultra Performance (100 m) | 74 (75 cap) | +61% |
+
+Limits: one PC, one run per state. A crowd standing close to you (everybody within 30 m) is not helped.
+All tests, numbers and visual verdicts: [addon-test/RESULTS-ADDON.md](addon-test/RESULTS-ADDON.md).
 
 ## Frame generation
 
@@ -98,6 +122,11 @@ The ini is read: setting `PhoenixSigMgr.LOD.TriangleBudget=3000000` changes the 
 4. Fix the cloth-off teleport crash.
 5. Spread remote-player spawns over several frames.
 6. Server option: per-player stream range or a cap on fully simulated nearby players.
+7. Do not draw or animate remote players that are far away: outside a class the client fully builds players
+   hundreds of metres away. Doing it from an add-on gave +42% to +61% FPS
+   ([addon-test/RESULTS-ADDON.md](addon-test/RESULTS-ADDON.md), Test 14).
+8. A crowd close by and on screen (about 95 players within 30 m, about 30 FPS): no player-side setting helps
+   (Test 15 of the same file).
 
 ### Reproduce
 - `test-harness/crowd-test`: server resource. Server console: `crowdrun <walk|walknamed|stand|players|churn|fxall|labels> [n,n,...]`, `crowdstop`.
